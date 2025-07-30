@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* Sahifani chiroyli qilish uchun oddiy stillar */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: var(--tg-theme-text-color, #222); /* Telegram temasidan rangni oladi */
+            background-color: var(--tg-theme-bg-color, #fff); /* Telegram temasidan fon rangini oladi */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .profile-card {
+            background-color: var(--tg-theme-secondary-bg-color, #f1f1f1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        #user-photo {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--tg-theme-button-color, #5294d5);
+        }
+        #user-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        #user-username {
+            font-size: 16px;
+            color: var(--tg-theme-hint-color, #888);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="profile-card">
+        <img id="user-photo" src="" alt="User Photo">
+        
+        <h1 id="user-name">Yuklanmoqda...</h1>
+        
+        <p id="user-username">@username</p>
+    </div>
+
+    <script>
+        // Sahifa to'liq yuklangandan so'ng JavaScript kodini ishga tushiramiz
+        document.addEventListener('DOMContentLoaded', function() {
+            // Telegram WebApp obyektini olamiz
+            const tg = window.Telegram.WebApp;
+
+            // Foydalanuvchi ma'lumotlari `initDataUnsafe` ichida joylashgan bo'ladi
+            const user = tg.initDataUnsafe?.user;
+
+            if (user) {
+                // Ma'lumotlarni HTML elementlarga joylashtiramiz
+                const userPhotoElement = document.getElementById('user-photo');
+                const userNameElement = document.getElementById('user-name');
+                const userUsernameElement = document.getElementById('user-username');
+
+                // 1. Profil rasmini o'rnatamiz
+                // Ba'zi foydalanuvchilarda rasm bo'lmasligi mumkin
+                if (user.photo_url) {
+                    userPhotoElement.src = user.photo_url;
+                } else {
+                    // Agar rasm bo'lmasa, boshlang'ich harfni ko'rsatamiz (ixtiyoriy)
+                    userPhotoElement.style.display = 'none'; // Yoki boshqa zaxira rasmini ko'rsatish mumkin
+                }
+
+                // 2. Ismini o'rnatamiz
+                userNameElement.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+
+                // 3. Username'ni o'rnatamiz
+                if (user.username) {
+                    userUsernameElement.textContent = '@' + user.username;
+                } else {
+                    userUsernameElement.textContent = 'Username mavjud emas';
+                }
+            } else {
+                // Agar Mini App Telegram'dan tashqarida ochilsa (masalan, brauzerda)
+                document.getElementById('user-name').textContent = "Iltimos, ilovani Telegram orqali oching";
+                document.getElementById('user-username').style.display = 'none';
+                document.getElementById('user-photo').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
