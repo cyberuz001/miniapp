@@ -26,13 +26,18 @@
         }
     </script>
     <style>
+        /* Kartochkalar uchun silliq animatsiya */
         @keyframes fade-in { 
             from { opacity: 0; transform: translateY(1rem); } 
             to { opacity: 1; transform: translateY(0); } 
         }
+        /* Aktiv menyu tugmasi uchun rang */
         .nav-item.active {
             color: var(--tg-theme-link-color, #62bcf9);
         }
+        /* Scrollbar uchun stillar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-tg-bg text-tg-text font-sans antialiased overflow-hidden">
@@ -40,11 +45,24 @@
     <div id="app" class="h-screen w-screen flex flex-col">
         <main class="flex-grow overflow-y-auto">
             <div id="home-page" class="page">
-                <div class="swiper h-48"><div class="swiper-wrapper">
-                    <div class="swiper-slide"><img src="https://via.placeholder.com/600x360/2ea6ff/ffffff?text=Top+O'yinlar" class="w-full h-full object-cover"></div>
-                    <div class="swiper-slide"><img src="https://via.placeholder.com/600x360/333333/ffffff?text=Aksiya" class="w-full h-full object-cover"></div>
-                </div></div>
-                <div class="flex justify-between items-center p-4"><h2 class="text-2xl font-bold tracking-tight">All Items</h2></div>
+                <div class="swiper h-48">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide"><img src="https://via.placeholder.com/600x360/2ea6ff/ffffff?text=Top+O'yinlar" class="w-full h-full object-cover"></div>
+                        <div class="swiper-slide"><img src="https://via.placeholder.com/600x360/333333/ffffff?text=Aksiya" class="w-full h-full object-cover"></div>
+                    </div>
+                </div>
+                <div class="px-4 py-3">
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                        <button class="bg-tg-button text-tg-button-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">All</button>
+                        <button class="bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">PUBG</button>
+                        <button class="bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Free Fire</button>
+                        <button class="bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Mobile Legends</button>
+                        <button class="bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">CS:GO</button>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center px-4 pt-1 pb-3">
+                    <h2 class="text-2xl font-bold tracking-tight">All Items</h2>
+                </div>
                 <div id="card-container" class="px-4 pb-4 grid grid-cols-2 gap-4"></div>
             </div>
 
@@ -56,15 +74,19 @@
                 <div id="profile-main">
                     <div class="flex flex-col items-center p-6"><img id="profile-photo" class="w-24 h-24 rounded-full border-2 border-tg-link"><h2 id="profile-name" class="text-2xl font-bold mt-4"></h2></div>
                     <div class="px-4 flex flex-col gap-3">
-                        <div onclick="requestUserPhone()" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]">
-                            <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg><span class="font-medium">Telefon raqamni ulashish</span></div>
+                        <div onclick="showSubPage('help-subpage')" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]">
+                            <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg><span class="font-medium">Yordam</span></div>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
                         </div>
-                        <div onclick="openLanguageModal()" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]">
-                            <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3.75h.008v.008H12v-.008zM12 15h.008v.008H12v-.008zm0-2.25h.008v.008H12v-.008zM3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg><span class="font-medium">Tilni o'zgartirish</span></div>
-                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+                        <div onclick="openSupportChat()" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]">
+                            <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.325 3.218.086 6.533-.533 9.491-2.311A2.25 2.25 0 0021 18.75V7.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 7.5v1.51z" /></svg><span class="font-medium">Support</span></div>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
                         </div>
                     </div>
+                </div>
+                <div id="help-subpage" class="hidden p-4">
+                     <h2 class="text-xl font-bold text-center mb-4">Ilova haqida</h2>
+                     <p class="text-tg-hint text-center">Bu ilova o'yin akkauntlarini sotib olish va sotish uchun mo'ljallangan platforma.</p>
                 </div>
             </div>
         </main>
@@ -73,7 +95,6 @@
     </div>
     
     <div id="item-modal" class="fixed inset-0 bg-tg-bg z-50 hidden flex-col transition-opacity duration-300 opacity-0"></div>
-    <div id="language-modal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4 transition-opacity duration-300 opacity-0"></div>
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -96,32 +117,58 @@
                 tg.BackButton.hide();
             }
         }
-        
+
+        function showSubPage(subPageId) {
+            const parentPage = document.getElementById(subPageId).closest('.page');
+            const mainContent = parentPage.querySelector('#profile-main');
+
+            localStorage.setItem('parentPageId', parentPage.id);
+            mainContent.classList.add('hidden');
+            document.getElementById(subPageId).classList.remove('hidden');
+            document.getElementById('bottom-nav').classList.add('hidden');
+            tg.BackButton.show();
+        }
+
+        function goBack() {
+            const parentPageId = localStorage.getItem('parentPageId');
+            if (parentPageId) {
+                const parentPage = document.getElementById(parentPageId);
+                const mainDiv = parentPage.querySelector('#profile-main');
+                const subDiv = parentPage.querySelector('#help-subpage');
+
+                if (subDiv) subDiv.classList.add('hidden');
+                mainDiv.classList.remove('hidden');
+                document.getElementById('bottom-nav').classList.remove('hidden');
+                tg.BackButton.hide();
+            }
+        }
+
         function openModal(adId) {
             const ad = dummyAds.find(item => item.id === adId);
             if (!ad) return;
 
             const modal = document.getElementById('item-modal');
             modal.innerHTML = `
-                <div class="flex-grow overflow-y-auto">
-                    <img src="${ad.image}" class="w-full aspect-square object-cover">
-                    <div class="p-4">
-                        <h2 class="text-3xl font-bold mb-2">${ad.title}</h2>
-                        <p class="text-lg text-tg-hint mb-4">#${ad.id}</p>
-                        <p class="text-base leading-relaxed">${ad.description}</p>
+                <div class="h-full w-full flex flex-col">
+                    <div class="flex-grow overflow-y-auto">
+                        <img src="${ad.image}" class="w-full aspect-square object-cover">
+                        <div class="p-4">
+                            <h2 class="text-3xl font-bold mb-2">${ad.title}</h2>
+                            <p class="text-lg text-tg-hint mb-4">#${ad.id}</p>
+                            <p class="text-base leading-relaxed">${ad.description}</p>
+                        </div>
                     </div>
+                    <footer class="flex-shrink-0 p-4 border-t border-gray-700/50 bg-tg-bg">
+                        ${ad.isAdmin ? 
+                            `<button class="w-full bg-tg-button text-tg-button-text font-bold py-4 rounded-xl">Sotib olish (${ad.price} Stars)</button>` : 
+                            `<div class="flex gap-3">
+                                <button class="flex-1 bg-white/10 text-tg-text font-bold py-4 rounded-xl">To'g'ridan-to'g'ri</button>
+                                <button class="flex-1 bg-tg-button text-tg-button-text font-bold py-4 rounded-xl">Admin Orqali</button>
+                            </div>`
+                        }
+                    </footer>
                 </div>
-                <footer class="flex-shrink-0 p-4 border-t border-gray-700/50">
-                    ${ad.isAdmin ? 
-                        `<button class="w-full bg-tg-button text-tg-button-text font-bold py-4 rounded-xl">Sotib olish (${ad.price} Stars)</button>` : 
-                        `<div class="flex gap-3">
-                            <button class="flex-1 bg-white/10 text-tg-text font-bold py-4 rounded-xl">To'g'ridan-to'g'ri</button>
-                            <button class="flex-1 bg-tg-button text-tg-button-text font-bold py-4 rounded-xl">Admin Orqali</button>
-                        </div>`
-                    }
-                </footer>
             `;
-
             modal.classList.remove('hidden');
             setTimeout(() => modal.classList.add('opacity-100'), 10);
             tg.BackButton.show();
@@ -134,30 +181,8 @@
             tg.BackButton.hide();
         }
 
-        function openLanguageModal() {
-            const modal = document.getElementById('language-modal');
-            modal.innerHTML = `
-                 <div class="bg-tg-secondary-bg rounded-2xl p-6 w-full max-w-sm">
-                    <h3 class="text-xl font-bold text-center mb-4">Tilni tanlang</h3>
-                    <div class="flex flex-col gap-3">
-                        <button class="w-full text-left p-3 rounded-lg hover:bg-white/10">O'zbekcha</button>
-                        <button class="w-full text-left p-3 rounded-lg hover:bg-white/10">Русский</button>
-                        <button class="w-full text-left p-3 rounded-lg hover:bg-white/10">English</button>
-                    </div>
-                    <button onclick="closeLanguageModal()" class="w-full mt-4 bg-tg-button text-tg-button-text font-bold py-3 rounded-lg">Yopish</button>
-                 </div>
-            `;
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.classList.add('opacity-100'), 10);
-        }
-        function closeLanguageModal() {
-            const modal = document.getElementById('language-modal');
-            modal.classList.remove('opacity-100');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-        
-        function requestUserPhone() {
-            tg.requestPhone();
+        function openSupportChat() {
+            tg.openTelegramLink('https://t.me/durov'); // O'zingizning support manzilingizni qo'ying
         }
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -167,22 +192,11 @@
             tg.expand();
 
             tg.onEvent('backButtonClicked', closeModal);
-            tg.onEvent('phone_requested', function(event) {
-                if (event.status === 'sent') {
-                    tg.showAlert(`Raqamingiz qabul qilindi: ${event.phone}`);
-                } else if (event.status === 'cancelled') {
-                    tg.showAlert('Siz raqamni ulashishni bekor qildingiz.');
-                }
-            });
 
             const user = tg.initDataUnsafe?.user;
             if (user) {
                 const profilePhoto = document.getElementById('profile-photo');
-                if (user.photo_url) {
-                    profilePhoto.src = user.photo_url;
-                } else {
-                    profilePhoto.classList.add('hidden');
-                }
+                if (user.photo_url) { profilePhoto.src = user.photo_url; } else { profilePhoto.classList.add('hidden'); }
                 document.getElementById('profile-name').textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
             }
 
@@ -190,7 +204,7 @@
 
             const container = document.getElementById('card-container');
             container.innerHTML = dummyAds.map((ad, index) => `
-                <div onclick="openModal(${ad.id})" class="flex flex-col rounded-2xl ${ad.isAdmin ? 'bg-blue-900/40 border border-blue-500' : 'bg-tg-bg'} overflow-hidden transition-transform active:scale-95 cursor-pointer opacity-0" style="animation: fade-in 0.5s ease forwards ${index * 0.1}s;">
+                <div onclick="openModal(${ad.id})" class="flex flex-col rounded-2xl ${ad.isAdmin ? 'bg-blue-900/40' : 'bg-tg-bg'} overflow-hidden transition-transform active:scale-95 cursor-pointer opacity-0" style="animation: fade-in 0.5s ease forwards ${index * 0.1}s;">
                     <img class="w-full h-auto aspect-square object-cover" src="${ad.image}" alt="${ad.title}">
                     <div class="p-3">
                         <p class="font-semibold truncate">${ad.title}</p>
