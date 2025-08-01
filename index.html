@@ -1,99 +1,894 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Game Market - O'yin Akkauntlari Bozori</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    
+    <!-- Custom Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Telegram Web App Script -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tg-bg': 'var(--tg-theme-bg-color, #17212b)',
+                        'tg-text': 'var(--tg-theme-text-color, #ffffff)',
+                        'tg-hint': 'var(--tg-theme-hint-color, #708499)',
+                        'tg-link': 'var(--tg-theme-link-color, #62bcf9)',
+                        'tg-button': 'var(--tg-theme-button-color, #5288c1)',
+                        'tg-secondary-bg': 'var(--tg-theme-secondary-bg-color, #222e3a)',
+                        'primary': '#62bcf9',
+                        'primary-dark': '#4a9fd9',
+                        'dark-bg': '#17212b',
+                        'dark-card': '#222e3a',
+                        'dark-border': '#2d3748',
+                        'admin-blue': '#3b82f6',
+                        'admin-blue-dark': '#2563eb'
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'modal-in': 'modalIn 0.3s ease-out',
+                        'modal-out': 'modalOut 0.3s ease-in'
+                    },
+                    backdropBlur: {
+                        'xs': '2px',
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
-        /* Sahifani chiroyli qilish uchun oddiy stillar */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            color: var(--tg-theme-text-color, #222); /* Telegram temasidan rangni oladi */
-            background-color: var(--tg-theme-bg-color, #fff); /* Telegram temasidan fon rangini oladi */
+        html, body { 
+            height: 100%; 
+            width: 100%; 
+            overflow: hidden; 
+            font-family: 'Inter', sans-serif;
+        }
+        body { 
+            position: fixed; 
+            background: linear-gradient(135deg, #17212b 0%, #1a252f 100%);
+        }
+        
+        /* Custom Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        @keyframes modalIn {
+            from { 
+                opacity: 0; 
+                transform: scale(0.9) translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: scale(1) translateY(0); 
+            }
+        }
+        
+        @keyframes modalOut {
+            from { 
+                opacity: 1; 
+                transform: scale(1) translateY(0); 
+            }
+            to { 
+                opacity: 0; 
+                transform: scale(0.9) translateY(20px); 
+            }
+        }
+        
+        /* Glassmorphism Effect */
+        .glass {
+            background: rgba(34, 46, 58, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-modal {
+            background: rgba(23, 33, 43, 0.95);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(98, 188, 249, 0.3);
+            border-radius: 2px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(98, 188, 249, 0.5);
+        }
+        
+        /* Card Hover Effects */
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-hover:active {
+            transform: translateY(-2px);
+        }
+        
+        /* Admin Card Style */
+        .admin-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        
+        /* Button Effects */
+        .btn-primary {
+            background: linear-gradient(135deg, #62bcf9 0%, #4a9fd9 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4a9fd9 0%, #3a8fc9 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(98, 188, 249, 0.3);
+        }
+        
+        .btn-admin {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-admin:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-primary:active, .btn-admin:active {
+            transform: translateY(0);
+        }
+        
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Swiper Custom Styles */
+        .swiper-pagination-bullet {
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 1;
+        }
+        
+        .swiper-pagination-bullet-active {
+            background: #62bcf9;
+        }
+        
+        /* Page Transitions */
+        .page {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .page.hidden {
+            opacity: 0;
+            transform: translateX(100%);
+        }
+        
+        .page.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
-        .profile-card {
-            background-color: var(--tg-theme-secondary-bg-color, #f1f1f1);
+        
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal-content {
+            width: 100%;
+            height: 100%;
+            max-width: 100vw;
+            max-height: 100vh;
+            overflow-y: auto;
+            animation: modalIn 0.3s ease-out;
+        }
+        
+        .modal.closing .modal-content {
+            animation: modalOut 0.3s ease-in;
+        }
+        
+        /* Status Badges */
+        .status-completed {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .status-pending {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+        
+        .status-cancelled {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        /* Language Selector */
+        .language-option {
+            transition: all 0.2s ease;
+        }
+        
+        .language-option:hover {
+            background: rgba(98, 188, 249, 0.1);
+        }
+        
+        .language-option.active {
+            background: rgba(98, 188, 249, 0.2);
+            border-left: 3px solid #62bcf9;
+        }
+        
+        /* Admin Menu */
+        .admin-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(34, 46, 58, 0.95);
+            backdrop-filter: blur(20px);
             border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+        
+        .admin-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        /* Chat Interface */
+        .chat-container {
+            height: calc(100vh - 120px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
             padding: 20px;
+        }
+        
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .message.sent {
+            background: linear-gradient(135deg, #62bcf9 0%, #4a9fd9 100%);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 6px;
+        }
+        
+        .message.received {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-right: auto;
+            border-bottom-left-radius: 6px;
+        }
+        
+        .message.system {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
             text-align: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        #user-photo {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--tg-theme-button-color, #5294d5);
-        }
-        #user-name {
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        #user-username {
-            font-size: 16px;
-            color: var(--tg-theme-hint-color, #888);
-            margin-top: 5px;
+            margin: 0 auto;
+            font-size: 14px;
         }
     </style>
 </head>
-<body>
 
-    <div class="profile-card">
-        <img id="user-photo" src="" alt="User Photo">
-        
-        <h1 id="user-name">Yuklanmoqda...</h1>
-        
-        <p id="user-username">@username</p>
+<body class="bg-tg-bg text-tg-text font-inter antialiased overflow-hidden">
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <div class="glass rounded-lg p-4 text-white max-w-sm">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium" id="notification-text"></p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <script>
-        // Sahifa to'liq yuklangandan so'ng JavaScript kodini ishga tushiramiz
-        document.addEventListener('DOMContentLoaded', function() {
-            // Telegram WebApp obyektini olamiz
-            const tg = window.Telegram.WebApp;
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="glass rounded-lg p-6 text-center">
+            <div class="loading mx-auto mb-4"></div>
+            <p class="text-white">Yuklanmoqda...</p>
+        </div>
+    </div>
 
-            // Foydalanuvchi ma'lumotlari `initDataUnsafe` ichida joylashgan bo'ladi
-            const user = tg.initDataUnsafe?.user;
+    <!-- Account Detail Modal -->
+    <div id="account-modal" class="modal">
+        <div class="modal-content glass-modal">
+            <div class="relative h-full">
+                <!-- Modal Header -->
+                <div class="sticky top-0 z-10 glass-modal border-b border-white/10 p-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-bold text-white" id="modal-title">Account Details</h2>
+                        <div class="flex items-center gap-3">
+                            <!-- Admin Menu (only for admins) -->
+                            <div id="admin-menu-container" class="relative hidden">
+                                <button id="admin-menu-btn" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"></path>
+                                    </svg>
+                                </button>
+                                <div id="admin-menu" class="admin-menu">
+                                    <button id="complete-sale-btn" class="w-full text-left px-4 py-3 text-sm text-white hover:bg-white/10 transition-colors">
+                                        Sotib olib berish tugatildi
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Close Button -->
+                            <button id="close-modal" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-            if (user) {
-                // Ma'lumotlarni HTML elementlarga joylashtiramiz
-                const userPhotoElement = document.getElementById('user-photo');
-                const userNameElement = document.getElementById('user-name');
-                const userUsernameElement = document.getElementById('user-username');
+                <!-- Modal Content -->
+                <div class="p-6">
+                    <!-- Account Image -->
+                    <div class="mb-6">
+                        <img id="modal-image" class="w-full h-64 object-cover rounded-2xl" src="/placeholder.svg" alt="">
+                    </div>
 
-                // 1. Profil rasmini o'rnatamiz
-                // Ba'zi foydalanuvchilarda rasm bo'lmasligi mumkin
-                if (user.photo_url) {
-                    userPhotoElement.src = user.photo_url;
-                } else {
-                    // Agar rasm bo'lmasa, boshlang'ich harfni ko'rsatamiz (ixtiyoriy)
-                    userPhotoElement.style.display = 'none'; // Yoki boshqa zaxira rasmini ko'rsatish mumkin
-                }
+                    <!-- Account Info -->
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h3 class="text-2xl font-bold text-white" id="modal-account-title"></h3>
+                                <p class="text-tg-hint" id="modal-account-id"></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-3xl font-bold text-primary" id="modal-price"></p>
+                                <p class="text-sm text-tg-hint" id="modal-game"></p>
+                            </div>
+                        </div>
 
-                // 2. Ismini o'rnatamiz
-                userNameElement.textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+                        <!-- Level and Seller Info -->
+                        <div class="flex items-center gap-4 mb-4">
+                            <div id="modal-level" class="bg-white/10 px-3 py-1 rounded-full text-sm hidden">
+                                <span class="text-tg-hint">Level:</span>
+                                <span class="text-white font-medium ml-1"></span>
+                            </div>
+                            <div class="bg-white/10 px-3 py-1 rounded-full text-sm">
+                                <span class="text-tg-hint">Sotuvchi:</span>
+                                <span class="text-white font-medium ml-1" id="modal-seller"></span>
+                            </div>
+                        </div>
 
-                // 3. Username'ni o'rnatamiz
-                if (user.username) {
-                    userUsernameElement.textContent = '@' + user.username;
-                } else {
-                    userUsernameElement.textContent = 'Username mavjud emas';
-                }
-            } else {
-                // Agar Mini App Telegram'dan tashqarida ochilsa (masalan, brauzerda)
-                document.getElementById('user-name').textContent = "Iltimos, ilovani Telegram orqali oching";
-                document.getElementById('user-username').style.display = 'none';
-                document.getElementById('user-photo').style.display = 'none';
-            }
-        });
-    </script>
+                        <!-- Description -->
+                        <div class="mb-6">
+                            <h4 class="text-lg font-semibold text-white mb-3">Tavsif</h4>
+                            <p class="text-tg-hint leading-relaxed" id="modal-description">
+                                Bu akkaunt haqida batafsil ma'lumot...
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div id="modal-actions" class="space-y-3">
+                        <!-- Direct Purchase Button -->
+                        <button id="direct-purchase-btn" class="w-full btn-primary text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                            To'g'ridan-to'g'ri sotib olish
+                        </button>
+
+                        <!-- Admin Purchase Button -->
+                        <button id="admin-purchase-btn" class="w-full btn-admin text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                            Admin orqali sotib olish
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Language Selection Modal -->
+    <div id="language-modal" class="modal">
+        <div class="modal-content flex items-center justify-center p-4">
+            <div class="glass rounded-2xl p-6 w-full max-w-sm">
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-white mb-2">Tilni tanlang</h3>
+                    <p class="text-tg-hint text-sm">Choose your language</p>
+                </div>
+                
+                <div class="space-y-2" id="language-options">
+                    <div class="language-option p-4 rounded-xl cursor-pointer active" data-lang="uz">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">🇺🇿</span>
+                                <div>
+                                    <p class="font-medium text-white">O'zbek tili</p>
+                                    <p class="text-sm text-tg-hint">Uzbek</p>
+                                </div>
+                            </div>
+                            <div class="w-5 h-5 rounded-full border-2 border-primary bg-primary flex items-center justify-center">
+                                <div class="w-2 h-2 bg-white rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="language-option p-4 rounded-xl cursor-pointer" data-lang="ru">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">🇷🇺</span>
+                                <div>
+                                    <p class="font-medium text-white">Русский язык</p>
+                                    <p class="text-sm text-tg-hint">Russian</p>
+                                </div>
+                            </div>
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-400"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="language-option p-4 rounded-xl cursor-pointer" data-lang="en">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">🇺🇸</span>
+                                <div>
+                                    <p class="font-medium text-white">English</p>
+                                    <p class="text-sm text-tg-hint">English</p>
+                                </div>
+                            </div>
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-400"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button id="cancel-language" class="flex-1 py-3 px-4 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-colors">
+                        Bekor qilish
+                    </button>
+                    <button id="save-language" class="flex-1 py-3 px-4 btn-primary text-white rounded-xl">
+                        Saqlash
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Modal -->
+    <div id="chat-modal" class="modal">
+        <div class="modal-content glass-modal">
+            <div class="chat-container">
+                <!-- Chat Header -->
+                <div class="glass-modal border-b border-white/10 p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <button id="close-chat" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                            <div>
+                                <h3 class="font-semibold text-white">Admin Chat</h3>
+                                <p class="text-sm text-tg-hint">Sotib olish jarayoni</p>
+                            </div>
+                        </div>
+                        <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                    </div>
+                </div>
+
+                <!-- Chat Messages -->
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message system">
+                        Admin bilan bog'lanish o'rnatildi. Sotib olish jarayoni boshlandi.
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="chat-input">
+                    <div class="flex gap-3">
+                        <input type="text" id="chat-input" placeholder="Xabar yozing..." 
+                               class="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-tg-hint focus:outline-none focus:border-primary">
+                        <button id="send-message" class="btn-primary px-6 py-3 rounded-xl">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app" class="h-screen w-screen flex flex-col">
+        <main class="flex-grow overflow-y-auto">
+            <!-- Bosh Sahifa -->
+            <div id="home-page" class="page active">
+                <!-- Hero Carousel -->
+                <div class="swiper h-48 mb-6">
+                    <div class="swiper-wrapper" id="carousel-wrapper">
+                        <!-- Carousel slides will be loaded dynamically -->
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="px-4 mb-6">
+                    <div class="flex gap-2 overflow-x-auto pb-2" id="filter-buttons">
+                        <!-- Filter buttons will be loaded dynamically -->
+                    </div>
+                </div>
+
+                <!-- Accounts Grid -->
+                <div class="px-4 pb-20">
+                    <div class="grid grid-cols-2 gap-4" id="accounts-grid">
+                        <!-- Account cards will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stars Sotib Olish Sahifasi -->
+            <div id="buy-stars-page" class="page hidden">
+                <div class="max-w-md mx-auto p-4">
+                    <!-- Header -->
+                    <div class="text-center mb-8 mt-8">
+                        <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-r from-primary to-primary-dark rounded-full flex items-center justify-center animate-pulse-slow">
+                            <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                            </svg>
+                        </div>
+                        <h1 class="text-2xl font-bold mb-2">Stars Sotib Oling</h1>
+                        <p class="text-tg-hint text-sm">E'lon joylashtirish va reklama xizmatlari uchun Stars to'plang</p>
+                    </div>
+
+                    <!-- Current Balance -->
+                    <div class="glass rounded-2xl p-4 mb-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-tg-hint">Joriy balans</p>
+                                <p class="text-2xl font-bold text-primary" id="current-balance">0 Stars</p>
+                            </div>
+                            <div class="w-12 h-12 bg-gradient-to-r from-primary to-primary-dark rounded-full flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Packages -->
+                    <div class="space-y-4" id="star-packages">
+                        <!-- Star packages will be loaded dynamically -->
+                    </div>
+
+                    <!-- Info -->
+                    <div class="glass rounded-2xl p-4 mt-6">
+                        <h3 class="font-semibold mb-2 text-primary">Stars nima uchun kerak?</h3>
+                        <ul class="text-sm text-tg-hint space-y-1">
+                            <li>• E'lon joylashtirish (10 Stars)</li>
+                            <li>• Reklama xizmati (50 Stars/hafta)</li>
+                            <li>• Premium e'lon (25 Stars)</li>
+                            <li>• Kafolat xizmati (5% komissiya)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarix Sahifasi -->
+            <div id="history-page" class="page hidden">
+                <div class="max-w-md mx-auto p-4">
+                    <!-- Header -->
+                    <div class="text-center mb-6 mt-8">
+                        <h1 class="text-2xl font-bold mb-2">Tranzaksiyalar Tarixi</h1>
+                        <p class="text-tg-hint text-sm">Barcha moliyaviy amallaringiz tarixi</p>
+                    </div>
+
+                    <!-- Filter -->
+                    <div class="flex gap-2 mb-6 overflow-x-auto pb-2" id="history-filters">
+                        <!-- History filters will be loaded dynamically -->
+                    </div>
+
+                    <!-- Transactions List -->
+                    <div class="space-y-4 pb-20" id="transactions-list">
+                        <!-- Transactions will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profil Sahifasi -->
+            <div id="profile-page" class="page hidden">
+                <div id="profile-main">
+                    <!-- Profile Header -->
+                    <div class="flex flex-col items-center p-6 mt-8">
+                        <div class="relative">
+                            <img id="profile-photo" class="w-24 h-24 rounded-full border-2 border-primary shadow-lg" src="https://via.placeholder.com/96x96" alt="Profile">
+                            <div id="admin-badge" class="absolute -top-2 -right-2 hidden">
+                                <span class="bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold px-2 py-1 rounded-full text-xs flex items-center">
+                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1a5 5 0 0110 0v1a2 2 0 01-2 2H6a2 2 0 01-2-2zm0-5a2 2 0 012-2h8a2 2 0 012 2v1a2 2 0 01-2 2H6a2 2 0 01-2-2V8z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    ADMIN
+                                </span>
+                            </div>
+                        </div>
+                        <h2 id="profile-name" class="text-2xl font-bold mt-4">Foydalanuvchi</h2>
+                        <p id="profile-username" class="text-tg-hint text-sm mt-1 hidden"></p>
+                    </div>
+
+                    <!-- Balance Card -->
+                    <div class="px-4 mb-6">
+                        <div class="bg-gradient-to-r from-primary to-primary-dark rounded-2xl p-4">
+                            <div class="flex items-center justify-between text-white">
+                                <div>
+                                    <p class="text-sm opacity-90">Stars Balansi</p>
+                                    <p class="text-2xl font-bold" id="profile-balance">0 ⭐</p>
+                                </div>
+                                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Menu Items -->
+                    <div class="px-4 space-y-3 pb-20">
+                        <!-- Phone Number -->
+                        <div onclick="requestUserPhone()" class="glass rounded-2xl p-4 cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] card-hover">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                        </svg>
+                                    </div>
+                                    <span class="font-medium">Telefon raqamni ulashish</span>
+                                </div>
+                                <svg class="w-5 h-5 text-tg-hint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Admin orqali sotib olish -->
+                        <div id="admin-purchases-item" class="glass rounded-2xl p-4 cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] card-hover" onclick="openAdminPurchases()">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-admin-blue/20 rounded-full flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-admin-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Admin orqali sotib olish</span>
+                                        <p class="text-xs text-tg-hint">Faol chatlar va buyurtmalar</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span id="active-chats-count" class="bg-admin-blue text-white text-xs px-2 py-1 rounded-full">0</span>
+                                    <svg class="w-5 h-5 text-tg-hint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Admin Panel -->
+                        <div id="admin-panel-item" class="hidden glass rounded-2xl p-4 cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] card-hover">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Admin Panel</span>
+                                        <p class="text-xs text-tg-hint">Boshqaruv paneli</p>
+                                    </div>
+                                </div>
+                                <svg class="w-5 h-5 text-tg-hint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Language Selection -->
+                        <div onclick="openLanguageModal()" class="glass rounded-2xl p-4 cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] card-hover">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Til / Language</span>
+                                        <p class="text-xs text-tg-hint" id="current-language">O'zbek tili</p>
+                                    </div>
+                                </div>
+                                <svg class="w-5 h-5 text-tg-hint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Help Center -->
+                        <div onclick="showSubPage('help-subpage')" class="glass rounded-2xl p-4 cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] card-hover">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                                        <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <span class="font-medium">Yordam Markazi</span>
+                                </div>
+                                <svg class="w-5 h-5 text-tg-hint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help Subpage -->
+                <div id="help-subpage" class="hidden p-4">
+                    <div class="max-w-md mx-auto mt-8">
+                        <div class="text-center mb-8">
+                            <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-r from-primary to-primary-dark rounded-full flex items-center justify-center">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <h1 class="text-2xl font-bold mb-2">Yordam Markazi</h1>
+                            <p class="text-tg-hint text-sm">Savollaringiz bo'lsa, biz bilan bog'laning</p>
+                        </div>
+
+                        <div class="glass rounded-2xl p-6 mb-6 text-center">
+                            <h3 class="font-semibold text-primary mb-4">Qo'llab-quvvatlash</h3>
+                            <p class="text-tg-hint mb-4">
+                                Texnik yordam yoki savollar uchun bizning qo'llab-quvvatlash guruhimiz bilan bog'laning:
+                            </p>
+                            <button class="btn-primary text-white px-6 py-3 rounded-lg font-medium" onclick="openTelegramLink('https://t.me/gamemarket_support')">
+                                @gamemarket_support
+                            </button>
+                        </div>
+
+                        <div class="glass rounded-2xl p-6">
+                            <h3 class="font-semibold text-primary mb-4">Tez-tez so'raladigan savollar</h3>
+                            <div class="space-y-4 text-sm">
+                                <div>
+                                    <p class="font-medium text-white mb-1">Akkaunt qanday sotib olaman?</p>
+                                    <p class="text-tg-hint">
+                                        Kerakli akkauntni tanlang va "Sotib olish" tugmasini bosing. Admin orqali xavfsiz to'lov amalga oshiriladi.
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-white mb-1">Stars nima uchun kerak?</p>
+                                    <p class="text-tg-hint">Stars e'lon joylashtirish va reklama xizmatlari uchun ishlatiladi.</p>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-white mb-1">Kafolat xizmati qanday ishlaydi?</p>
+                                    <p class="text-tg-hint">
+                                        Admin vositachi sifatida to'lov va akkaunt ma'lumotlari almashinuvini nazorat qiladi.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <footer id="bottom-nav" class="flex-shrink-0 h-16 glass flex justify-around items-center">
+            <!-- Navigation items will be loaded dynamically -->
+        </footer>
+    </div>
+
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
+    <!-- Main JavaScript -->
+    <script src="js/app.js"></script>
 </body>
 </html>
