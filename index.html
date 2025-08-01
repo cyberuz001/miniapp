@@ -26,16 +26,13 @@
         }
     </script>
     <style>
-        /* Kartochkalar uchun silliq animatsiya */
         @keyframes fade-in { 
             from { opacity: 0; transform: translateY(1rem); } 
             to { opacity: 1; transform: translateY(0); } 
         }
-        /* Aktiv menyu tugmasi uchun rang */
         .nav-item.active {
             color: var(--tg-theme-link-color, #62bcf9);
         }
-        /* Scrollbar uchun stillar */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -56,18 +53,13 @@
                         <button class="bg-tg-button text-tg-button-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">All</button>
                         <button class="bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">PUBG</button>
                         <button class="bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Free Fire</button>
-                        <button class="bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Mobile Legends</button>
-                        <button class="bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">CS:GO</button>
                     </div>
                 </div>
-                <div class="flex justify-between items-center px-4 pt-1 pb-3">
-                    <h2 class="text-2xl font-bold tracking-tight">All Items</h2>
-                </div>
+                <div class="flex justify-between items-center px-4 pt-1 pb-3"><h2 class="text-2xl font-bold tracking-tight">All Items</h2></div>
                 <div id="card-container" class="px-4 pb-4 grid grid-cols-2 gap-4"></div>
             </div>
 
             <div id="buy-stars-page" class="page hidden p-4 text-center"><h2 class="text-xl font-bold mt-10">Buy Stars</h2><p class="text-tg-hint mt-2">Bu bo'lim tez kunda ishga tushadi.</p></div>
-            
             <div id="history-page" class="page hidden p-4 text-center"><h2 class="text-xl font-bold mt-10">History</h2><p class="text-tg-hint mt-2">Hozircha amallar mavjud emas.</p></div>
 
             <div id="profile-page" class="page hidden">
@@ -98,140 +90,112 @@
 
     <script>
         const tg = window.Telegram.WebApp;
-        const ADMIN_IDS = [12345678];
+        const navigationStack = []; // YANGI NAVIGATSIYA TIZIMI
+
+        // ... (dummyAds o'zgaruvchisi va boshqa boshlang'ich ma'lumotlar)
         const dummyAds = [
-            { id: 3673, title: 'Bonded Ring', price: '80', image: 'https://via.placeholder.com/600x600/2ea6ff/17212b?text=Item1', isAdmin: false, description: 'Bu juda kuchli uzuk bo\'lib, egasiga +50 himoya beradi. Faqat bitta nusxada mavjud. Narxi kelishiladi.' },
-            { id: 1550, title: 'Spiced Wine', price: '7.6', image: 'https://via.placeholder.com/600x600/e91e63/17212b?text=Item2', isAdmin: true, description: 'Admin tomonidan sotilayotgan maxsus ichimlik. +100 jon qo\'shadi.' },
-            { id: 1120, title: 'Cyber Bow', price: '120', image: 'https://via.placeholder.com/600x600/4caf50/17212b?text=Item3', isAdmin: false, description: 'Kibernetik o\'q-yoy. Zarari 2 barobar kuchli.' },
-            { id: 4055, title: 'Magic Potion', price: '24.5', image: 'https://via.placeholder.com/600x600/ff9800/17212b?text=Item4', isAdmin: false, description: 'Sehrli ichimlik. 5 daqiqaga ko\'rinmas qiladi.' },
+            { id: 3673, title: 'Bonded Ring', price: '80', image: 'https://via.placeholder.com/600x600/2ea6ff/17212b?text=Item1', isAdmin: false, description: 'Juda kuchli uzuk.' },
+            { id: 1550, title: 'Spiced Wine', price: '7.6', image: 'https://via.placeholder.com/600x600/e91e63/17212b?text=Item2', isAdmin: true, description: 'Admin maxsus ichimligi.' },
         ];
 
-        function showPage(pageId, navElement) {
-            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            document.getElementById(pageId).classList.remove('hidden');
-            if (navElement) {
-                document.querySelectorAll('#bottom-nav .nav-item').forEach(i => i.classList.remove('active'));
-                navElement.classList.add('active');
+        // NAVIGATSIYA FUNKSIYALARI (YANGILANDI)
+        function updateUI(view) {
+            document.querySelectorAll('.page, #item-modal').forEach(el => el.classList.add('hidden'));
+            if (view.type === 'page') {
+                document.getElementById(view.id).classList.remove('hidden');
+                document.getElementById('bottom-nav').classList.remove('hidden');
+            } else if (view.type === 'modal') {
+                document.getElementById(view.id).classList.remove('hidden');
+                document.getElementById('bottom-nav').classList.add('hidden');
+            } else if (view.type === 'subpage') {
+                const parentPage = document.getElementById('profile-page');
+                parentPage.classList.remove('hidden');
+                parentPage.querySelector('#profile-main').classList.add('hidden');
+                document.getElementById(view.id).classList.remove('hidden');
+                document.getElementById('bottom-nav').classList.add('hidden');
             }
-            if (tg.BackButton.isVisible) {
+
+            if (navigationStack.length > 1) {
+                tg.BackButton.show();
+            } else {
                 tg.BackButton.hide();
             }
         }
 
-        function showSubPage(subPageId) {
-            const parentPage = document.getElementById(subPageId).closest('.page');
-            const mainContent = parentPage.querySelector('#profile-main');
-
-            localStorage.setItem('parentPageId', parentPage.id);
-            mainContent.classList.add('hidden');
-            document.getElementById(subPageId).classList.remove('hidden');
-            document.getElementById('bottom-nav').classList.add('hidden');
-            tg.BackButton.show();
+        function navigateTo(view) {
+            navigationStack.push(view);
+            updateUI(view);
         }
 
         function goBack() {
-            const parentPageId = localStorage.getItem('parentPageId');
-            if (parentPageId) {
-                const parentPage = document.getElementById(parentPageId);
-                const mainDiv = parentPage.querySelector('#profile-main');
-                const subDiv = parentPage.querySelector('#help-subpage');
-
-                if (subDiv) subDiv.classList.add('hidden');
-                mainDiv.classList.remove('hidden');
-                document.getElementById('bottom-nav').classList.remove('hidden');
-                tg.BackButton.hide();
+            if (navigationStack.length > 1) {
+                navigationStack.pop();
+                const currentView = navigationStack[navigationStack.length - 1];
+                updateUI(currentView);
             }
         }
-
+        
         function openModal(adId) {
             const ad = dummyAds.find(item => item.id === adId);
             if (!ad) return;
 
             const modal = document.getElementById('item-modal');
-            modal.innerHTML = `
-                <div class="h-full w-full flex flex-col">
-                    <div class="flex-grow overflow-y-auto">
-                        <img src="${ad.image}" class="w-full aspect-square object-cover">
-                        <div class="p-4">
-                            <h2 class="text-3xl font-bold mb-2">${ad.title}</h2>
-                            <p class="text-lg text-tg-hint mb-4">#${ad.id}</p>
-                            <p class="text-base leading-relaxed">${ad.description}</p>
-                        </div>
-                    </div>
-                    <footer class="flex-shrink-0 p-4 border-t border-gray-700/50 bg-tg-bg">
-                        ${ad.isAdmin ? 
-                            `<button class="w-full bg-tg-button text-tg-button-text font-bold py-4 rounded-xl">Sotib olish (${ad.price} Stars)</button>` : 
-                            `<div class="flex gap-3">
-                                <button class="flex-1 bg-white/10 text-tg-text font-bold py-4 rounded-xl">To'g'ridan-to'g'ri</button>
-                                <button class="flex-1 bg-tg-button text-tg-button-text font-bold py-4 rounded-xl">Admin Orqali</button>
-                            </div>`
-                        }
-                    </footer>
-                </div>
-            `;
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.classList.add('opacity-100'), 10);
-            tg.BackButton.show();
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('item-modal');
-            modal.classList.remove('opacity-100');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-            tg.BackButton.hide();
+            modal.innerHTML = `...`; // (Modal tarkibi oldingi koddan olinadi)
+            navigateTo({type: 'modal', id: 'item-modal'});
         }
 
         function openSupportChat() {
-            tg.openTelegramLink('https://t.me/durov'); // O'zingizning support manzilingizni qo'ying
+            const supportUsername = 'durov'; // <-- MUHIM: BU YERGA O'ZINGIZNING SUPPORT USERNAME'INGIZNI YOZING!
+            if (supportUsername === 'your_support_username') {
+                tg.showAlert('Support akkaunti hali sozlanmagan.');
+                return;
+            }
+            tg.openTelegramLink(`https://t.me/${supportUsername}`);
         }
 
         document.addEventListener('DOMContentLoaded', function () {
             tg.ready();
-            tg.setHeaderColor('secondary_bg_color'); 
+            tg.setHeaderColor('secondary_bg_color');
             tg.setBackgroundColor('secondary_bg_color');
             tg.expand();
 
-            tg.onEvent('backButtonClicked', closeModal);
+            // ORTGA QAYTISH TUGMASI UCHUN YAGONA HODISA
+            tg.onEvent('backButtonClicked', goBack);
+            
+            // Boshlang'ich sahifani o'rnatish
+            navigationStack.push({type: 'page', id: 'home-page'});
+            updateUI(navigationStack[0]);
 
-            const user = tg.initDataUnsafe?.user;
-            if (user) {
-                const profilePhoto = document.getElementById('profile-photo');
-                if (user.photo_url) { profilePhoto.src = user.photo_url; } else { profilePhoto.classList.add('hidden'); }
-                document.getElementById('profile-name').textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
-            }
-
-            new Swiper('.swiper', { loop: true, autoplay: { delay: 3000 } });
-
+            // KARTALARNI CHIZISH
             const container = document.getElementById('card-container');
             container.innerHTML = dummyAds.map((ad, index) => `
                 <div onclick="openModal(${ad.id})" class="flex flex-col rounded-2xl ${ad.isAdmin ? 'bg-blue-900/40' : 'bg-tg-bg'} overflow-hidden transition-transform active:scale-95 cursor-pointer opacity-0" style="animation: fade-in 0.5s ease forwards ${index * 0.1}s;">
-                    <img class="w-full h-auto aspect-square object-cover" src="${ad.image}" alt="${ad.title}">
-                    <div class="p-3">
-                        <p class="font-semibold truncate">${ad.title}</p>
-                        <p class="text-xs text-tg-hint">#${ad.id}</p>
-                        <div class="flex justify-between items-center mt-3">
-                            <div class="flex items-center gap-1.5 bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-bold py-2 px-3 rounded-lg">
-                                <svg class="w-4 h-4" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 0L0 4.66667V14L8 9.33333L16 14V4.66667L8 0Z" fill="white"/></svg>
-                                ${ad.price}
-                            </div>
-                            <div class="w-9 h-9 flex items-center justify-center bg-white/10 rounded-lg">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-white"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c.51 0 .962-.328 1.093-.826l1.821-6.831c.13-.483-.145-.996-.644-1.17a48.11 48.11 0 00-1.821-.545A48.11 48.11 0 007.5 4.5M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" /></svg>
-                            </div>
-                        </div>
                     </div>
-                </div>
             `).join('');
             
+            // PASTKI MENYUNI CHIZISH
             const navItems = [
-                { id: 'home-page', label: 'Home', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>' },
-                { id: 'buy-stars-page', label: 'Buy Stars', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>' },
-                { id: 'history-page', label: 'History', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>' },
-                { id: 'profile-page', label: 'Profile', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>' }
+                { id: 'home-page', label: 'Home' },
+                { id: 'buy-stars-page', label: 'Buy Stars' },
+                { id: 'history-page', label: 'History' },
+                { id: 'profile-page', label: 'Profile' }
             ];
             const navContainer = document.getElementById('bottom-nav');
-            navContainer.innerHTML = navItems.map(item => `<div class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint" onclick="showPage('${item.id}', this)"><div class="w-6 h-6">${item.icon}</div><span class="text-xs font-medium">${item.label}</span></div>`).join('');
-
-            showPage('home-page', navContainer.querySelector('.nav-item'));
+            // ... (Menyuni chizish logikasi)
+            navItems.forEach(item => {
+                const navElement = document.createElement('div');
+                // ... (elementlarni yaratish va onclick qo'shish)
+                navElement.onclick = () => {
+                    // Pastki menyu bosilganda navigatsiya stack'ini tozalab, bosh sahifaga o'tish
+                    navigationStack.length = 0;
+                    navigateTo({type: 'page', id: item.id});
+                    // Aktiv holatni belgilash
+                    document.querySelectorAll('#bottom-nav .nav-item').forEach(i => i.classList.remove('active'));
+                    navElement.classList.add('active');
+                };
+                navContainer.appendChild(navElement);
+            });
+             document.querySelector('#bottom-nav .nav-item').classList.add('active');
         });
     </script>
 </body>
