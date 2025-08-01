@@ -1,0 +1,282 @@
+html, body { 
+    height: 100%; 
+    width: 100%; 
+    overflow: hidden; 
+    font-family: 'Inter', sans-serif;
+}
+
+body { 
+    position: fixed; 
+    background: linear-gradient(135deg, #17212b 0%, #1a252f 100%);
+}
+
+/* Custom Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+@keyframes modalIn {
+    from { 
+        opacity: 0; 
+        transform: scale(0.9) translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1) translateY(0); 
+    }
+}
+
+@keyframes modalOut {
+    from { 
+        opacity: 1; 
+        transform: scale(1) translateY(0); 
+    }
+    to { 
+        opacity: 0; 
+        transform: scale(0.9) translateY(20px); 
+    }
+}
+
+/* Glassmorphism Effect */
+.glass {
+    background: rgba(34, 46, 58, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-modal {
+    background: rgba(23, 33, 43, 0.95);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(98, 188, 249, 0.3);
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(98, 188, 249, 0.5);
+}
+
+/* Card Hover Effects */
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+.card-hover:active {
+    transform: translateY(-2px);
+}
+
+/* Admin Card Style */
+.admin-card {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Button Effects */
+.btn-primary {
+    background: linear-gradient(135deg, #62bcf9 0%, #4a9fd9 100%);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #4a9fd9 0%, #3a8fc9 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(98, 188, 249, 0.3);
+}
+
+.btn-admin {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    transition: all 0.3s ease;
+}
+
+.btn-admin:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary:active, .btn-admin:active {
+    transform: translateY(0);
+}
+
+/* Loading Animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Swiper Custom Styles */
+.swiper-pagination-bullet {
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+    background: #62bcf9;
+}
+
+/* Page Transitions */
+.page {
+    transition: all 0.3s ease-in-out;
+}
+
+.page.hidden {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.page.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Modal Styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    width: 100%;
+    height: 100%;
+    max-width: 100vw;
+    max-height: 100vh;
+    overflow-y: auto;
+    animation: modalIn 0.3s ease-out;
+}
+
+.modal.closing .modal-content {
+    animation: modalOut 0.3s ease-in;
+}
+
+/* Chat Interface */
+.chat-container {
+    height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.chat-input {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.message {
+    margin-bottom: 15px;
+    padding: 12px 16px;
+    border-radius: 18px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.message.sent {
+    background: linear-gradient(135deg, #62bcf9 0%, #4a9fd9 100%);
+    color: white;
+    margin-left: auto;
+    border-bottom-right-radius: 6px;
+}
+
+.message.received {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    margin-right: auto;
+    border-bottom-left-radius: 6px;
+}
+
+.message.system {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+    text-align: center;
+    margin: 0 auto;
+    font-size: 14px;
+}
+
+/* Notification */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1100;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+/* Admin Menu */
+.admin-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: rgba(34, 46, 58, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 100;
+}
+
+.admin-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
