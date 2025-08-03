@@ -33,16 +33,12 @@
         
         body { overflow: hidden; }
 
-        /* Sahifalarni sukut bo'yicha yashirish */
+        /* Stillar asl holatiga qaytarildi, bu "kichrayish" muammosini hal qiladi */
         .page {
             display: none;
         }
-        
-        /* Aktiv sahifa flex konteyner bo'lib, ota-onasining to'liq balandligini egallasin */
         .page.active {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
+            display: block;
         }
 
         .carousel-container .swiper-button-next, .carousel-container .swiper-button-prev { color: #fff; }
@@ -54,20 +50,22 @@
     <div id="app" class="h-screen w-screen flex flex-col">
         <main class="flex-grow overflow-y-auto">
             <div id="home-page" class="page active">
-                <div class="swiper h-48 flex-shrink-0">
+                <div class="swiper h-48">
                     <div class="swiper-wrapper">
                         <div class="swiper-slide"><img src="https://via.placeholder.com/600x360/2ea6ff/ffffff?text=Top+O'yinlar" class="w-full h-full object-cover"></div>
                         <div class="swiper-slide"><img src="https://via.placeholder.com/600x360/333333/ffffff?text=Aksiya" class="w-full h-full object-cover"></div>
                     </div>
                 </div>
-                <div class="px-4 py-3 flex-shrink-0"><div id="category-container" class="flex gap-2 overflow-x-auto no-scrollbar pb-2"></div></div>
-                <div class="flex justify-between items-center px-4 pt-1 pb-3 flex-shrink-0"><h2 class="text-2xl font-bold tracking-tight" data-translate-key="all_items"></h2></div>
-                <div id="card-container" class="px-4 pb-4 grid grid-cols-2 gap-4 overflow-y-auto"></div>
+                <div class="px-4 py-3"><div id="category-container" class="flex gap-2 overflow-x-auto no-scrollbar pb-2"></div></div>
+                <div class="flex justify-between items-center px-4 pt-1 pb-3"><h2 class="text-2xl font-bold tracking-tight" data-translate-key="all_items"></h2></div>
+                <div id="card-container" class="px-4 pb-4 grid grid-cols-2 gap-4"></div>
             </div>
 
-            <div id="buy-stars-page" class="page p-4 text-center items-center justify-center"><h2 class="text-xl font-bold mt-10" data-translate-key="buy_stars"></h2><p class="text-tg-hint mt-2" data-translate-key="coming_soon"></p></div>
-            <div id="history-page" class="page p-4 text-center items-center justify-center"><h2 class="text-xl font-bold mt-10" data-translate-key="history"></h2><p class="text-tg-hint mt-2" data-translate-key="no_history"></p></div>
-            <div id="profile-page" class="page overflow-y-auto">
+            <div id="buy-stars-page" class="page p-4 text-center"><h2 class="text-xl font-bold mt-10" data-translate-key="buy_stars"></h2><p class="text-tg-hint mt-2" data-translate-key="coming_soon"></p></div>
+            
+            <div id="history-page" class="page p-4 text-center"><h2 class="text-xl font-bold mt-10" data-translate-key="history"></h2><p class="text-tg-hint mt-2" data-translate-key="no_history"></p></div>
+            
+            <div id="profile-page" class="page">
                 <div class="flex flex-col items-center p-6"><img id="profile-photo" class="w-24 h-24 rounded-full border-2 border-tg-link"><h2 id="profile-name" class="text-2xl font-bold mt-4"></h2></div>
                 <div class="px-4 flex flex-col gap-3">
                     <div id="my-purchases-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer active:scale-[0.98]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c.51 0 .962-.328 1.093-.826l1.821-6.831c.13-.483-.145-.996-.644-1.17a48.11 48.11 0 00-1.821-.545A48.11 48.11 0 007.5 4.5M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" /></svg><span class="font-medium" data-translate-key="my_purchases"></span></div><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>
@@ -76,10 +74,12 @@
                     <div id="language-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer active:scale-[0.98]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502Z" /></svg><span class="font-medium" data-translate-key="language"></span></div><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>
                 </div>
             </div>
-            <div id="my-purchases-page" class="page p-4 overflow-y-auto"><h2 class="text-xl font-bold mb-4 flex-shrink-0" data-translate-key="my_purchases"></h2><div id="my-purchases-container" class="space-y-3"></div></div>
-            <div id="help-page" class="page p-4 text-center items-center justify-center"><h2 class="text-xl font-bold text-center mb-4" data-translate-key="help_title"></h2><p class="text-tg-hint text-center" data-translate-key="help_content"></p></div>
+
+            <div id="my-purchases-page" class="page p-4"><h2 class="text-xl font-bold mb-4" data-translate-key="my_purchases"></h2><div id="my-purchases-container" class="space-y-3"></div></div>
             
-            <div id="chat-page" class="page flex flex-col">
+            <div id="help-page" class="page p-4"><h2 class="text-xl font-bold text-center mb-4" data-translate-key="help_title"></h2><p class="text-tg-hint text-center" data-translate-key="help_content"></p></div>
+            
+            <div id="chat-page" class="page flex flex-col h-full">
                 <header class="flex-shrink-0 p-4 bg-tg-secondary-bg flex items-center gap-4 border-b border-gray-700/50">
                     <img src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full">
                     <div><h3 class="font-bold" data-translate-key="support"></h3><p class="text-sm text-tg-hint">online</p></div>
