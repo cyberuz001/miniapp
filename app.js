@@ -41,28 +41,68 @@ async function loadCategories() {
   }
 }
 
+// Page navigation function
+function showPage(pageId) {
+  console.log("Showing page:", pageId)
+
+  // Hide all pages
+  document.querySelectorAll(".page").forEach((page) => {
+    page.classList.remove("active")
+  })
+
+  // Show selected page
+  const targetPage = document.getElementById(pageId)
+  if (targetPage) {
+    targetPage.classList.add("active")
+  }
+
+  // Update navigation active state
+  document.querySelectorAll(".nav-item").forEach((item) => {
+    item.classList.remove("active")
+    item.classList.add("text-tg-hint")
+  })
+
+  // Find and activate current nav item
+  const currentNavItem = document.querySelector(`[onclick="showPage('${pageId}')"]`)
+  if (currentNavItem) {
+    currentNavItem.classList.add("active")
+    currentNavItem.classList.remove("text-tg-hint")
+  }
+}
+
 function renderBanners(banners) {
   const container = document.getElementById("banner-container")
+  if (!container) return
+
   container.innerHTML = banners
     .map(
       (banner) => `
-        <div class="swiper-slide">
-            <img src="${banner.image_url}" class="w-full h-full object-cover" alt="${banner.title}">
-        </div>
-    `,
+            <div class="swiper-slide">
+                <img src="${banner.image_url}" class="w-full h-full object-cover rounded-lg" alt="${banner.title}">
+            </div>
+        `,
     )
     .join("")
 
-  // Initialize Swiper
-  if (window.Swiper) {
-    new window.Swiper(".swiper", {
-      loop: true,
-      autoplay: { delay: 3000 },
-      pagination: {
-        el: ".swiper-pagination",
-      },
-    })
-  }
+  // Initialize Swiper after content is loaded
+  setTimeout(() => {
+    if (window.Swiper) {
+      new window.Swiper(".swiper", {
+        loop: true,
+        autoplay: {
+          delay: 3000,
+          disableOnInteraction: false,
+        },
+        pagination: {
+          el: ".swiper-pagination",
+          clickable: true,
+        },
+        effect: "slide",
+        speed: 500,
+      })
+      console.log("Swiper initialized successfully")
+    }
+  }, 100)
 }
 
 function renderStarPackages(packages) {
@@ -418,9 +458,12 @@ function filterItems(category) {
     btn.classList.add("bg-tg-secondary-bg", "text-tg-text")
   })
 
-  // Activate clicked button
-  event.target.classList.remove("bg-tg-secondary-bg", "text-tg-text")
-  event.target.classList.add("bg-tg-button", "text-white", "active")
+  // Find and activate the correct button
+  const activeButton = document.querySelector(`[onclick="filterItems('${category}')"]`)
+  if (activeButton) {
+    activeButton.classList.remove("bg-tg-secondary-bg", "text-tg-text")
+    activeButton.classList.add("bg-tg-button", "text-white", "active")
+  }
 
   // Filter items
   if (category === "all") {
@@ -572,8 +615,8 @@ function loadSampleData() {
   const sampleCategories = [
     { _id: "1", name: "PUBG" },
     { _id: "2", name: "Free Fire" },
-    { _id: "3", name: "Call of Duty" },
-    { _id: "4", name: "Clash of Clans" },
+    { _id: "3", name: "Mobile Legend" },
+    { _id: "4", name: "CSGO" },
   ]
 
   // Sample items
@@ -616,12 +659,21 @@ function loadSampleData() {
     },
     {
       id: "1005",
-      title: "Call of Duty Legendary",
-      description: "COD Mobile account with legendary weapons and skins.",
+      title: "Mobile Legend Mythic",
+      description: "Mobile Legend account with Mythic rank and rare skins.",
       price: 200,
-      image: "https://via.placeholder.com/300x300/9c27b0/ffffff?text=COD+Legendary",
-      category: "Call of Duty",
+      image: "https://via.placeholder.com/300x300/9c27b0/ffffff?text=ML+Mythic",
+      category: "Mobile Legend",
       isAdmin: true,
+    },
+    {
+      id: "1006",
+      title: "CSGO Prime Account",
+      description: "CSGO Prime account with rare skins and high rank.",
+      price: 300,
+      image: "https://via.placeholder.com/300x300/f44336/ffffff?text=CSGO+Prime",
+      category: "CSGO",
+      isAdmin: false,
     },
   ]
 
@@ -636,6 +688,11 @@ function loadSampleData() {
       _id: "b2",
       title: "Special Offer",
       image_url: "https://via.placeholder.com/600x360/e91e63/ffffff?text=Special+Offer",
+    },
+    {
+      _id: "b3",
+      title: "New Arrivals",
+      image_url: "https://via.placeholder.com/600x360/4caf50/ffffff?text=New+Arrivals",
     },
   ]
 
@@ -670,7 +727,6 @@ function loadSampleData() {
   renderItems(sampleItems)
   renderCategories(sampleCategories)
   renderBanners(sampleBanners)
-  renderStarPackages(sampleStarPackages)
 
   console.log("Sample data loaded successfully")
 }
