@@ -1,947 +1,648 @@
-// Telegram Web App Integration
-const tg = window.Telegram?.WebApp || {}
-const ADMIN_IDS = [12345678, 87654321] // Admin ID'larini bu yerga qo'shing
-
-// API Base URL
-const API_BASE_URL = "http://localhost:5000/api"
-
-// Global State
+// Global variables
+const tg = window.Telegram.WebApp
+const API_BASE_URL = "http://localhost:8000/api"
+const navigationStack = []
 let currentUser = null
-let currentBalance = 0
-let accounts = []
-let transactions = []
-let selectedFilter = "all"
-let activeChats = []
-let currentAccountModal = null
+let currentItems = []
+let currentCategories = []
+const Swiper = window.Swiper // Declare Swiper variable
 
-// Utility Functions
-function showNotification(message, type = "success") {
-    const notification = document.getElementById("notification")
-    const notificationText = document.getElementById("notification-text")
+// Initialize app
+document.addEventListener("DOMContentLoaded", () => {
+  initializeTelegramWebApp()
+  initializeNavigation()
+  initializeEventListeners()
+  loadInitialData()
+})
 
-    notificationText.textContent = message
-    notification.classList.add("show")
+function initializeTelegramWebApp() {
+  tg.ready()
+  tg.setHeaderColor("secondary_bg_color")
+  tg.setBackgroundColor("secondary_bg_color")
+  tg.expand()
+  tg.onEvent("backButtonClicked", handleBackPress)
 
-    setTimeout(() => {
-        notification.classList.remove("show")
-    }, 3000)
+  // Get user data from Telegram
+  const user = tg.initDataUnsafe?.user
+  if (user) {
+    currentUser = user
+    updateProfileUI(user)
+    authenticateUser(user)
+  }
 }
 
-function showLoading() {
-    document.getElementById("loading-overlay").classList.remove("hidden")
-}
+function initializeNavigation() {
+  const navItems = [
+    {
+      id: "home-page",
+      label: "Home",
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>',
+    },
+    {
+      id: "buy-stars-page",
+      label: "Buy Stars",
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>',
+    },
+    {
+      id: "history-page",
+      label: "History",
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>',
+    },
+    {
+      id: "profile-page",
+      label: "Profile",
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>',
+    },
+  ]
 
-function hideLoading() {
-    document.getElementById("loading-overlay").classList.add("hidden")
-}
+  const navContainer = document.getElementById("bottom-nav")
+  navContainer.innerHTML = ""
 
-function formatDate(dateString) {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("uz-UZ", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+  navItems.forEach((item) => {
+    const navElement = document.createElement("div")
+    navElement.className = "nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint"
+    navElement.innerHTML = `<div class="w-6 h-6">${item.icon}</div><span class="text-xs font-medium">${item.label}</span>`
+
+    navElement.addEventListener("click", () => {
+      navigationStack.length = 0
+      navigateTo({ type: "page", id: item.id })
+
+      document.querySelectorAll("#bottom-nav .nav-item").forEach((i) => i.classList.remove("active"))
+      navElement.classList.add("active")
     })
+    navContainer.appendChild(navElement)
+  })
+
+  document.querySelector("#bottom-nav .nav-item").classList.add("active")
+
+  if (navigationStack.length === 0) {
+    navigateTo({ type: "page", id: "home-page" })
+  }
 }
 
-function formatCurrency(amount, currency = "USD") {
-    if (currency === "Stars") {
-        return `${amount} ⭐`
+function initializeEventListeners() {
+  // Message sending
+  document.getElementById("send-message-btn").addEventListener("click", sendMessage)
+  document.getElementById("message-input").addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      sendMessage()
     }
-    return `$${amount}`
+  })
+}
+
+async function loadInitialData() {
+  try {
+    showLoading(true)
+    await Promise.all([loadItems(), loadCategories(), loadBanners(), loadStarPackages()])
+    showLoading(false)
+  } catch (error) {
+    console.error("Error loading initial data:", error)
+    showLoading(false)
+    showError("Failed to load data. Please try again.")
+  }
 }
 
 // API Functions
-async function apiRequest(endpoint, options = {}) {
-    try {
-        showLoading()
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-                ...options.headers,
-            },
-            ...options,
-        })
+async function apiCall(endpoint, options = {}) {
+  const url = `${API_BASE_URL}${endpoint}`
+  const defaultOptions = {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  }
 
-        const data = await response.json()
+  if (currentUser) {
+    defaultOptions.headers["X-Telegram-User"] = JSON.stringify(currentUser)
+  }
 
-        if (!response.ok) {
-            throw new Error(data.message || "API xatosi yuz berdi")
-        }
+  const response = await fetch(url, { ...defaultOptions, ...options })
 
-        return data
-    } catch (error) {
-        console.error("API Error:", error)
-        showNotification(error.message, "error")
-        throw error
-    } finally {
-        hideLoading()
-    }
+  if (!response.ok) {
+    throw new Error(`API call failed: ${response.statusText}`)
+  }
+
+  return response.json()
 }
 
-// Authentication
-async function authenticateUser() {
-    try {
-        const initData = tg.initData
-        if (!initData) {
-            throw new Error("Telegram ma'lumotlari topilmadi")
-        }
-
-        const response = await apiRequest("/auth/telegram", {
-            method: "POST",
-            body: JSON.stringify({ initData }),
-        })
-
-        localStorage.setItem("token", response.token)
-        currentUser = response.user
-        currentBalance = response.user.balance || 0
-
-        updateUserProfile()
-        return response
-    } catch (error) {
-        console.error("Authentication error:", error)
-        // Fallback to demo data if authentication fails
-        currentUser = {
-            id: 123456789,
-            first_name: "Demo",
-            last_name: "User",
-            username: "demo_user",
-            photo_url: null,
-            balance: 0,
-        }
-        updateUserProfile()
-    }
-}
-
-// Data Loading Functions
-async function loadAccounts() {
-    try {
-        const response = await apiRequest("/accounts")
-        accounts = response.accounts || []
-        renderAccounts()
-    } catch (error) {
-        // Fallback to demo data
-        accounts = [
-            {
-                id: 3673,
-                title: "PUBG Pro Account",
-                price: 80,
-                image: "https://via.placeholder.com/300x300",
-                game: "PUBG",
-                level: 95,
-                featured: false,
-                seller: "ProGamer123",
-                description: "Bu akkaunt Conqueror darajasida bo'lib, barcha mashhur skinlar va qurollar mavjud. 500+ o'yin soatlari, yuqori K/D ratio va professional statistikalar bilan.",
-                isAdminAccount: false,
-            },
-            {
-                id: 1550,
-                title: "Free Fire Elite",
-                price: 45,
-                image: "https://via.placeholder.com/300x300",
-                game: "Free Fire",
-                level: 67,
-                featured: false,
-                seller: "Admin",
-                description: "Diamond darajasidagi akkaunt. Barcha premium personajlar, noyob skinlar va maxsus effektlar mavjud. Elite Pass to'liq ochilgan.",
-                isAdminAccount: true,
-            },
-            {
-                id: 1120,
-                title: "ML Legend Rank",
-                price: 120,
-                image: "https://via.placeholder.com/300x300",
-                game: "Mobile Legends",
-                level: 89,
-                featured: false,
-                seller: "LegendPlayer",
-                description: "Legend darajasidagi akkaunt. 100+ hero, barcha skinlar va maxsus effektlar. Yuqori win rate va professional statistikalar.",
-                isAdminAccount: false,
-            },
-            {
-                id: 4055,
-                title: "CS:GO Prime",
-                price: 95,
-                image: "https://via.placeholder.com/300x300",
-                game: "CS:GO",
-                level: 25,
-                featured: false,
-                seller: "CSPro",
-                description: "Prime akkaunt, Global Elite darajasi. Noyob knife va AK-47 skinlari mavjud. 2000+ soat o'yin tajribasi.",
-                isAdminAccount: true,
-            },
-        ]
-        renderAccounts()
-    }
-}
-
-async function loadTransactions() {
-    try {
-        const response = await apiRequest("/transactions")
-        transactions = response.transactions || []
-        renderTransactions()
-    } catch (error) {
-        // Fallback to demo data
-        transactions = [
-            {
-                id: "tx001",
-                type: "purchase",
-                title: "PUBG Pro Account sotib olindi",
-                amount: 80,
-                currency: "USD",
-                date: "2024-01-15T10:30:00Z",
-                status: "completed",
-                description: "Akkaunt #3673 muvaffaqiyatli sotib olindi",
-            },
-            {
-                id: "tx002",
-                type: "stars",
-                title: "500 Stars sotib olindi",
-                amount: 8.99,
-                currency: "USD",
-                date: "2024-01-14T15:20:00Z",
-                status: "completed",
-                description: "+50 bonus Stars bilan",
-            },
-            {
-                id: "tx003",
-                type: "ad",
-                title: "E'lon reklamasi",
-                amount: 50,
-                currency: "Stars",
-                date: "2024-01-13T09:15:00Z",
-                status: "completed",
-                description: "Free Fire Elite akkaunt uchun 7 kunlik reklama",
-            },
-        ]
-        renderTransactions()
-    }
-}
-
-// Modal Functions
-function openAccountModal(accountId) {
-    const account = accounts.find((acc) => acc.id === accountId)
-    if (!account) return
-
-    currentAccountModal = account
-    const modal = document.getElementById("account-modal")
-
-    // Fill modal content
-    document.getElementById("modal-title").textContent = account.title
-    document.getElementById("modal-image").src = account.image
-    document.getElementById("modal-account-title").textContent = account.title
-    document.getElementById("modal-account-id").textContent = `#${account.id}`
-    document.getElementById("modal-price").textContent = `$${account.price}`
-    document.getElementById("modal-game").textContent = account.game
-    document.getElementById("modal-seller").textContent = account.seller
-    document.getElementById("modal-description").textContent = account.description
-
-    // Show/hide level
-    const levelElement = document.getElementById("modal-level")
-    if (account.level) {
-        levelElement.classList.remove("hidden")
-        levelElement.querySelector("span:last-child").textContent = account.level
-    } else {
-        levelElement.classList.add("hidden")
-    }
-
-    // Show admin menu if user is admin
-    const adminMenuContainer = document.getElementById("admin-menu-container")
-    if (currentUser && ADMIN_IDS.includes(currentUser.id)) {
-        adminMenuContainer.classList.remove("hidden")
-    } else {
-        adminMenuContainer.classList.add("hidden")
-    }
-
-    // Show modal
-    modal.classList.add("active")
-    document.body.style.overflow = "hidden"
-}
-
-function closeAccountModal() {
-    const modal = document.getElementById("account-modal")
-    modal.classList.add("closing")
-
-    setTimeout(() => {
-        modal.classList.remove("active", "closing")
-        document.body.style.overflow = "auto"
-        currentAccountModal = null
-    }, 300)
-}
-
-function openChatModal(accountId) {
-    const account = accounts.find((acc) => acc.id === accountId)
-    if (!account) return
-
-    // Deduct stars for admin purchase
-    if (currentBalance < 10) {
-        showNotification("Admin orqali sotib olish uchun kamida 10 Stars kerak", "error")
-        return
-    }
-
-    currentBalance -= 10
-    updateUserProfile()
-
-    // Add to active chats
-    const chatId = Date.now()
-    activeChats.push({
-        id: chatId,
-        accountId: accountId,
-        accountTitle: account.title,
-        status: "active",
-        messages: [
-            {
-                type: "system",
-                text: `${account.title} uchun admin bilan bog'lanish o'rnatildi. 10 Stars to'landi.`,
-                timestamp: new Date(),
-            },
-            {
-                type: "received",
-                text: `Assalomu alaykum! ${account.title} akkauntini sotib olish uchun murojaat qildingiz. Tez orada sizga akkaunt ma'lumotlarini yuboraman.`,
-                timestamp: new Date(),
-            },
-        ],
+async function authenticateUser(user) {
+  try {
+    const userData = await apiCall("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({
+        telegram_id: user.id,
+        username: user.username,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        photo_url: user.photo_url,
+      }),
     })
 
-    updateActiveChatCount()
+    currentUser = { ...user, ...userData }
+    updateProfileUI(currentUser)
 
-    const modal = document.getElementById("chat-modal")
-    loadChatMessages(chatId)
-    modal.classList.add("active")
-    document.body.style.overflow = "hidden"
-
-    showNotification("Admin bilan chat boshlandi. 10 Stars to'landi.")
-    closeAccountModal()
-}
-
-function closeChatModal() {
-    const modal = document.getElementById("chat-modal")
-    modal.classList.remove("active")
-    document.body.style.overflow = "auto"
-}
-
-function loadChatMessages(chatId) {
-    const chat = activeChats.find((c) => c.id === chatId)
-    if (!chat) return
-
-    const messagesContainer = document.getElementById("chat-messages")
-    messagesContainer.innerHTML = ""
-
-    chat.messages.forEach((message) => {
-        const messageDiv = document.createElement("div")
-        messageDiv.className = `message ${message.type}`
-        messageDiv.textContent = message.text
-        messagesContainer.appendChild(messageDiv)
-    })
-
-    messagesContainer.scrollTop = messagesContainer.scrollHeight
-}
-
-function sendChatMessage() {
-    const input = document.getElementById("chat-input")
-    const message = input.value.trim()
-
-    if (!message) return
-
-    // Add user message
-    const messagesContainer = document.getElementById("chat-messages")
-    const messageDiv = document.createElement("div")
-    messageDiv.className = "message sent"
-    messageDiv.textContent = message
-    messagesContainer.appendChild(messageDiv)
-
-    input.value = ""
-    messagesContainer.scrollTop = messagesContainer.scrollHeight
-
-    // Simulate admin response
-    setTimeout(() => {
-        const adminResponse = document.createElement("div")
-        adminResponse.className = "message received"
-        adminResponse.textContent = "Xabaringiz qabul qilindi. Tez orada javob beraman."
-        messagesContainer.appendChild(adminResponse)
-        messagesContainer.scrollTop = messagesContainer.scrollHeight
-    }, 1000)
-}
-
-function completeSale() {
-    if (!currentAccountModal) return
-
-    const confirmed = confirm("Sotib olib berish tugatilganini tasdiqlaysizmi?")
-    if (!confirmed) return
-
-    // Remove from active chats
-    activeChats = activeChats.filter((chat) => chat.accountId !== currentAccountModal.id)
-    updateActiveChatCount()
-
-    showNotification("Sotish jarayoni tugatildi va chat yopildi")
-    closeAccountModal()
-    closeChatModal()
-}
-
-function openAdminPurchases() {
-    if (activeChats.length === 0) {
-        showNotification("Hozircha faol chatlar yo'q")
-        return
+    // Show admin panel if user is admin
+    if (currentUser.role && ["general_admin", "admin", "supporter"].includes(currentUser.role)) {
+      document.getElementById("admin-panel-btn").classList.remove("hidden")
     }
-
-    // For demo, just open the first active chat
-    const firstChat = activeChats[0]
-    openChatModal(firstChat.accountId)
+  } catch (error) {
+    console.error("Authentication failed:", error)
+  }
 }
 
-function updateActiveChatCount() {
-    const countElement = document.getElementById("active-chats-count")
-    countElement.textContent = activeChats.length
+async function loadItems(category = null) {
+  try {
+    const endpoint = category ? `/items?category=${category}` : "/items"
+    const items = await apiCall(endpoint)
+    currentItems = items
+    renderItems(items)
+  } catch (error) {
+    console.error("Error loading items:", error)
+    showError("Failed to load items")
+  }
 }
 
-// Rendering Functions
-function renderAccounts() {
-    const container = document.getElementById("accounts-grid")
-    const filteredAccounts = selectedFilter === "all" ? accounts : accounts.filter((account) => account.game === selectedFilter)
+async function loadCategories() {
+  try {
+    const categories = await apiCall("/categories")
+    currentCategories = categories
+    renderCategories(categories)
+  } catch (error) {
+    console.error("Error loading categories:", error)
+  }
+}
 
-    container.innerHTML = filteredAccounts
-        .map(
-            (account, index) => `
-        <div class="card-hover glass rounded-2xl overflow-hidden transition-all duration-300 ${account.isAdminAccount ? "admin-card" : ""}" 
-             style="animation: fadeIn 0.5s ease-out ${index * 0.1}s both;"
-             onclick="openAccountModal(${account.id})">
-            <div class="relative">
-                <img src="${account.image}" alt="${account.title}" 
-                     class="w-full aspect-square object-cover">
-                ${
-                    account.level
-                        ? `
-                    <div class="absolute top-2 left-2">
-                        <span class="bg-black/70 text-white px-2 py-1 rounded-full text-xs font-medium">
-                            LVL ${account.level}
-                        </span>
-                    </div>
-                `
-                        : ""
-                }
-            </div>
-            
+async function loadBanners() {
+  try {
+    const banners = await apiCall("/banners")
+    renderBanners(banners)
+  } catch (error) {
+    console.error("Error loading banners:", error)
+  }
+}
+
+async function loadStarPackages() {
+  try {
+    const packages = await apiCall("/star-packages")
+    renderStarPackages(packages)
+  } catch (error) {
+    console.error("Error loading star packages:", error)
+  }
+}
+
+async function loadPurchaseHistory() {
+  try {
+    const history = await apiCall("/purchases/history")
+    renderPurchaseHistory(history)
+  } catch (error) {
+    console.error("Error loading purchase history:", error)
+  }
+}
+
+async function loadMyPurchases() {
+  try {
+    const purchases = await apiCall("/purchases/my")
+    renderMyPurchases(purchases)
+  } catch (error) {
+    console.error("Error loading purchases:", error)
+  }
+}
+
+// Render Functions
+function renderItems(items) {
+  const container = document.getElementById("card-container")
+  container.innerHTML = items
+    .map(
+      (item, index) => `
+        <div onclick="openModal('${item._id}')" class="flex flex-col rounded-2xl ${item.is_admin_item ? "bg-blue-900/40" : "bg-tg-bg"} overflow-hidden transition-transform active:scale-95 cursor-pointer opacity-0" style="animation: fade-in 0.5s ease forwards ${index * 0.1}s;">
+            <img class="w-full h-auto aspect-square object-cover" src="${item.image_url || "/placeholder.svg?height=200&width=200"}" alt="${item.title}">
             <div class="p-3">
-                <p class="font-semibold truncate text-white">${account.title}</p>
-                <p class="text-xs text-tg-hint mb-3">#${account.id}</p>
-                
-                <div class="flex justify-between items-center">
-                    <button class="btn-primary text-white font-bold px-3 py-2 rounded-lg flex items-center gap-1.5">
+                <p class="font-semibold truncate">${item.title}</p>
+                <p class="text-xs text-tg-hint">#${item.item_id}</p>
+                <div class="flex justify-between items-center mt-3">
+                    <div class="flex items-center gap-1.5 bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-bold py-2 px-3 rounded-lg">
                         <svg class="w-4 h-4" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M8 0L0 4.66667V14L8 9.33333L16 14V4.66667L8 0Z" fill="white"/>
                         </svg>
-                        $${account.price}
-                    </button>
-                    
-                    <button class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-colors"
-                            onclick="event.stopPropagation(); addToCart(${account.id})">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        ${item.price}
+                    </div>
+                    <div class="w-9 h-9 flex items-center justify-center bg-white/10 rounded-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-white">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c.51 0 .962-.328 1.093-.826l1.821-6.831c.13-.483-.145-.996-.644-1.17a48.11 48.11 0 00-1.821-.545A48.11 48.11 0 007.5 4.5M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
                         </svg>
-                    </button>
+                    </div>
                 </div>
             </div>
         </div>
     `,
-        )
-        .join("")
+    )
+    .join("")
 }
 
-function renderCarousel() {
-    const wrapper = document.getElementById("carousel-wrapper")
-    const carouselAds = [
-        { id: 1, image: "https://via.placeholder.com/600x360", title: "Top O'yinlar" },
-        { id: 2, image: "https://via.placeholder.com/600x360", title: "Maxsus Taklif" },
-        { id: 3, image: "https://via.placeholder.com/600x360", title: "Yangi Akkauntlar" },
-    ]
+function renderCategories(categories) {
+  const container = document.getElementById("category-filters")
+  container.innerHTML = `
+        <button onclick="filterByCategory(null)" class="category-btn bg-tg-button text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">All</button>
+        ${categories
+          .map(
+            (cat) => `
+            <button onclick="filterByCategory('${cat._id}')" class="category-btn bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">${cat.name}</button>
+        `,
+          )
+          .join("")}
+    `
+}
 
-    wrapper.innerHTML = carouselAds
-        .map(
-            (ad) => `
+function renderBanners(banners) {
+  const container = document.getElementById("banner-container")
+  container.innerHTML = banners
+    .map(
+      (banner) => `
         <div class="swiper-slide">
-            <div class="relative h-full">
-                <img src="${ad.image}" alt="${ad.title}" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                <div class="absolute bottom-4 left-4">
-                    <h3 class="text-xl font-bold text-white">${ad.title}</h3>
-                </div>
-            </div>
+            <img src="${banner.image_url || "/placeholder.svg?height=360&width=600"}" class="w-full h-full object-cover">
         </div>
     `,
-        )
-        .join("")
+    )
+    .join("")
+
+  // Initialize Swiper
+  if (Swiper) {
+    new Swiper(".swiper", {
+      loop: true,
+      autoplay: { delay: 3000 },
+      pagination: {
+        el: ".swiper-pagination",
+      },
+    })
+  } else {
+    console.error("Swiper is not defined")
+  }
 }
 
-function renderFilterButtons() {
-    const container = document.getElementById("filter-buttons")
-    const filters = ["all", "PUBG", "Free Fire", "Mobile Legends", "CS:GO"]
-    const filterLabels = {
-        all: "Barchasi",
-        PUBG: "PUBG",
-        "Free Fire": "Free Fire",
-        "Mobile Legends": "Mobile Legends",
-        "CS:GO": "CS:GO",
-    }
-
-    container.innerHTML = filters
-        .map(
-            (filter) => `
-        <button class="whitespace-nowrap px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-            selectedFilter === filter
-                ? "btn-primary text-white"
-                : "border border-primary text-primary hover:bg-primary hover:text-white"
-        }" onclick="filterAccounts('${filter}')">
-            ${filterLabels[filter]}
-        </button>
+function renderStarPackages(packages) {
+  const container = document.getElementById("star-packages")
+  container.innerHTML = packages
+    .map(
+      (pkg) => `
+        <div class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center">
+            <div>
+                <h3 class="font-bold">${pkg.stars} Stars</h3>
+                <p class="text-tg-hint text-sm">${pkg.description}</p>
+            </div>
+            <button onclick="buyStars('${pkg._id}')" class="bg-tg-button text-white px-4 py-2 rounded-lg">
+                $${pkg.price}
+            </button>
+        </div>
     `,
-        )
-        .join("")
+    )
+    .join("")
 }
 
-function renderStarPackages() {
-    const container = document.getElementById("star-packages")
-    const packages = [
-        {
-            id: 1,
-            stars: 100,
-            price: 1.99,
-            bonus: 0,
-            icon: "star",
-            popular: false,
-            color: "from-blue-500 to-cyan-400",
-        },
-        {
-            id: 2,
-            stars: 500,
-            price: 8.99,
-            bonus: 50,
-            icon: "zap",
-            popular: true,
-            color: "from-purple-500 to-pink-500",
-        },
-        {
-            id: 3,
-            stars: 1000,
-            price: 16.99,
-            bonus: 150,
-            icon: "crown",
-            popular: false,
-            color: "from-yellow-500 to-orange-500",
-        },
-        {
-            id: 4,
-            stars: 2500,
-            price: 39.99,
-            bonus: 500,
-            icon: "gem",
-            popular: false,
-            color: "from-emerald-500 to-teal-500",
-        },
-    ]
+function renderPurchaseHistory(history) {
+  const container = document.getElementById("history-container")
+  if (history.length === 0) {
+    container.innerHTML = '<p class="text-tg-hint text-center">No purchase history yet.</p>'
+    return
+  }
 
-    const iconSvgs = {
-        star: '<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>',
-        zap: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>',
-        crown: '<path fill-rule="evenodd" d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1a5 5 0 0110 0v1a2 2 0 01-2 2H6a2 2 0 01-2-2zm0-5a2 2 0 012-2h8a2 2 0 012 2v1a2 2 0 01-2 2H6a2 2 0 01-2-2V8z" clip-rule="evenodd"></path>',
-        gem: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 010 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4"></path>',
-    }
-
-    container.innerHTML = packages
-        .map(
-            (pkg) => `
-        <div class="glass rounded-2xl p-4 card-hover ${pkg.popular ? "ring-2 ring-primary" : ""}">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <div class="w-12 h-12 bg-gradient-to-r ${pkg.color} rounded-full flex items-center justify-center">
-                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            ${iconSvgs[pkg.icon]}
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-2">
-                            <p class="font-bold text-lg">${pkg.stars} Stars</p>
-                            ${pkg.popular ? '<span class="bg-primary text-white text-xs px-2 py-1 rounded-full">MASHHUR</span>' : ""}
-                        </div>
-                        ${pkg.bonus > 0 ? `<p class="text-sm text-green-400">+${pkg.bonus} bonus Stars</p>` : ""}
-                        <p class="text-sm text-tg-hint">Jami: ${pkg.stars + pkg.bonus} Stars</p>
-                    </div>
+  container.innerHTML = history
+    .map(
+      (purchase) => `
+        <div class="bg-tg-secondary-bg p-4 rounded-xl mb-3">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h3 class="font-bold">${purchase.item.title}</h3>
+                    <p class="text-tg-hint text-sm">${new Date(purchase.created_at).toLocaleDateString()}</p>
                 </div>
-                
                 <div class="text-right">
-                    <p class="text-xl font-bold text-primary">$${pkg.price}</p>
-                    <button class="btn-primary text-white px-4 py-2 rounded-lg mt-2 font-medium"
-                            onclick="purchaseStars(${pkg.id})">
-                        Sotib Olish
-                    </button>
+                    <p class="font-bold">${purchase.price} Stars</p>
+                    <p class="text-xs ${purchase.status === "completed" ? "text-green-400" : "text-yellow-400"}">${purchase.status}</p>
                 </div>
             </div>
         </div>
     `,
-        )
-        .join("")
+    )
+    .join("")
 }
 
-function renderTransactions() {
-    const container = document.getElementById("transactions-list")
+function renderMyPurchases(purchases) {
+  const container = document.getElementById("purchases-container")
+  if (purchases.length === 0) {
+    container.innerHTML = '<p class="text-tg-hint text-center">No purchases yet.</p>'
+    return
+  }
 
-    if (transactions.length === 0) {
-        container.innerHTML = `
-            <div class="glass rounded-2xl p-8 text-center">
-                <svg class="w-12 h-12 text-tg-hint mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0V7a2 2 0 012-2h4a2 2 0 012 2v0M8 7v10a2 2 0 002 2h4a2 2 0 002-2V7M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-2"></path>
-                </svg>
-                <p class="text-tg-hint">Hozircha amallar mavjud emas</p>
+  container.innerHTML = purchases
+    .map(
+      (purchase) => `
+        <div class="bg-tg-secondary-bg p-4 rounded-xl mb-3">
+            <h3 class="font-bold mb-2">${purchase.item.title}</h3>
+            <div class="space-y-1 text-sm">
+                <p><span class="text-tg-hint">Login:</span> ${purchase.credentials.login}</p>
+                <p><span class="text-tg-hint">Password:</span> ${purchase.credentials.password}</p>
+                <p><span class="text-tg-hint">Purchase Date:</span> ${new Date(purchase.created_at).toLocaleDateString()}</p>
             </div>
-        `
-        return
-    }
+        </div>
+    `,
+    )
+    .join("")
+}
 
-    const getTransactionIcon = (type) => {
-        const icons = {
-            purchase: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>',
-            sale: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>',
-            stars: '<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>',
-            ad: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>',
-        }
-        return icons[type] || icons.purchase
-    }
+// Navigation Functions
+function updateUI(view) {
+  document.querySelectorAll(".page, #item-modal").forEach((el) => el.classList.add("hidden"))
+  document.querySelectorAll("#profile-main, #help-subpage").forEach((el) => el.classList.add("hidden"))
 
-    const getStatusClass = (status) => {
-        const classes = {
-            completed: "status-completed",
-            pending: "status-pending",
-            cancelled: "status-cancelled",
-        }
-        return classes[status] || "bg-gray-500"
-    }
+  const bottomNav = document.getElementById("bottom-nav")
 
-    const getStatusText = (status) => {
-        const texts = {
-            completed: "Bajarildi",
-            pending: "Kutilmoqda",
-            cancelled: "Bekor qilindi",
-        }
-        return texts[status] || "Noma'lum"
+  if (view.type === "page") {
+    const pageEl = document.getElementById(view.id)
+    pageEl.classList.remove("hidden")
+    if (view.id === "profile-page") {
+      pageEl.querySelector("#profile-main").classList.remove("hidden")
     }
+    if (view.id === "history-page") {
+      loadPurchaseHistory()
+    }
+    if (view.id === "my-purchases-page") {
+      loadMyPurchases()
+    }
+    bottomNav.classList.remove("hidden")
+  } else if (view.type === "modal") {
+    const modalEl = document.getElementById(view.id)
+    modalEl.classList.remove("hidden")
+    setTimeout(() => modalEl.classList.add("opacity-100"), 10)
+    bottomNav.classList.add("hidden")
+  } else if (view.type === "subpage") {
+    const parentPage = document.getElementById("profile-page")
+    parentPage.classList.remove("hidden")
+    document.getElementById(view.id).classList.remove("hidden")
+    bottomNav.classList.add("hidden")
+  }
 
-    container.innerHTML = transactions
-        .map(
-            (transaction) => `
-        <div class="glass rounded-2xl p-4 card-hover">
-            <div class="flex items-start justify-between">
-                <div class="flex items-start space-x-3">
-                    <div class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary flex-shrink-0">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            ${getTransactionIcon(transaction.type)}
-                        </svg>
+  if (navigationStack.length > 1) {
+    tg.BackButton.show()
+  } else {
+    tg.BackButton.hide()
+  }
+}
+
+function navigateTo(view) {
+  navigationStack.push(view)
+  updateUI(view)
+}
+
+function handleBackPress() {
+  if (navigationStack.length > 1) {
+    const currentView = navigationStack.pop()
+    if (currentView.type === "modal") {
+      const modal = document.getElementById(currentView.id)
+      modal.classList.remove("opacity-100")
+      setTimeout(() => {
+        modal.classList.add("hidden")
+      }, 300)
+    }
+    const previousView = navigationStack[navigationStack.length - 1]
+    updateUI(previousView)
+  }
+}
+
+// Item Functions
+async function openModal(itemId) {
+  try {
+    const item = currentItems.find((i) => i._id === itemId)
+    if (!item) return
+
+    const modal = document.getElementById("item-modal")
+    modal.innerHTML = `
+            <div class="h-full w-full flex flex-col">
+                <div class="flex-grow overflow-y-auto">
+                    <img src="${item.image_url || "/placeholder.svg?height=400&width=400"}" class="w-full aspect-square object-cover">
+                    <div class="p-4">
+                        <h2 class="text-3xl font-bold mb-2">${item.title}</h2>
+                        <p class="text-lg text-tg-hint mb-4">#${item.item_id}</p>
+                        <p class="text-base leading-relaxed mb-4">${item.description}</p>
+                        <div class="bg-tg-secondary-bg p-3 rounded-lg">
+                            <p class="text-sm text-tg-hint mb-1">Category</p>
+                            <p class="font-medium">${item.category?.name || "General"}</p>
+                        </div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="font-semibold text-white truncate">${transaction.title}</h3>
-                        <p class="text-sm text-tg-hint mt-1">${transaction.description}</p>
-                        <p class="text-xs text-tg-hint mt-2">${formatDate(transaction.date)}</p>
-                    </div>
                 </div>
-                
-                <div class="text-right flex-shrink-0 ml-4">
-                    <p class="font-bold text-lg ${
-                        transaction.type === "sale"
-                            ? "text-green-400"
-                            : transaction.type === "purchase"
-                                ? "text-red-400"
-                                : "text-primary"
-                    }">
-                        ${transaction.type === "sale" ? "+" : "-"}${formatCurrency(transaction.amount, transaction.currency)}
-                    </p>
-                    <span class="text-xs px-2 py-1 rounded-full ${getStatusClass(transaction.status)} text-white mt-2 inline-block">
-                        ${getStatusText(transaction.status)}
-                    </span>
-                </div>
-            </div>
+                <footer class="flex-shrink-0 p-4 border-t border-gray-700/50 bg-tg-bg">
+                    ${
+                      item.is_admin_item
+                        ? `<button onclick="showPurchaseModal('${item._id}', 'admin')" class="w-full bg-tg-button text-white font-bold py-4 rounded-xl">Buy via Admin (${item.price} Stars)</button>`
+                        : `<div class="flex gap-3">
+                            <button onclick="showPurchaseModal('${item._id}', 'direct')" class="flex-1 bg-white/10 text-tg-text font-bold py-4 rounded-xl">Direct Purchase</button>
+                            <button onclick="showPurchaseModal('${item._id}', 'admin')" class="flex-1 bg-tg-button text-white font-bold py-4 rounded-xl">Via Admin</button>
+                        </div>`
+                    }
+                </footer>
+            </div>`
+    navigateTo({ type: "modal", id: "item-modal" })
+  } catch (error) {
+    console.error("Error opening modal:", error)
+    showError("Failed to load item details")
+  }
+}
+
+function showPurchaseModal(itemId, type) {
+  const item = currentItems.find((i) => i._id === itemId)
+  if (!item) return
+
+  const modal = document.getElementById("purchase-modal")
+  const details = document.getElementById("purchase-details")
+
+  details.innerHTML = `
+        <div class="text-center">
+            <h4 class="font-bold mb-2">${item.title}</h4>
+            <p class="text-2xl font-bold text-tg-link mb-2">${item.price} Stars</p>
+            <p class="text-sm text-tg-hint">Purchase Type: ${type === "admin" ? "Via Admin" : "Direct"}</p>
         </div>
-    `,
-        )
-        .join("")
+    `
+
+  modal.classList.remove("hidden")
+  modal.dataset.itemId = itemId
+  modal.dataset.purchaseType = type
 }
 
-function renderHistoryFilters() {
-    const container = document.getElementById("history-filters")
-    const filters = [
-        { key: "all", label: "Barchasi" },
-        { key: "purchase", label: "Xaridlar" },
-        { key: "sale", label: "Sotuvlar" },
-        { key: "stars", label: "Stars" },
-        { key: "ad", label: "Reklama" },
-    ]
-
-    container.innerHTML = filters
-        .map(
-            (filter) => `
-        <button class="whitespace-nowrap px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-            selectedFilter === filter.key
-                ? "btn-primary text-white"
-                : "border border-primary text-primary hover:bg-primary hover:text-white"
-        }" onclick="filterTransactions('${filter.key}')">
-            ${filter.label}
-        </button>
-    `,
-        )
-        .join("")
+function closePurchaseModal() {
+  document.getElementById("purchase-modal").classList.add("hidden")
 }
 
-function renderBottomNavigation() {
-    const container = document.getElementById("bottom-nav")
-    const navItems = [
-        { id: "home-page", label: "Home", icon: "home" },
-        { id: "buy-stars-page", label: "Stars", icon: "star" },
-        { id: "history-page", label: "History", icon: "history" },
-        { id: "profile-page", label: "Profile", icon: "user" },
-    ]
+async function confirmPurchase() {
+  const modal = document.getElementById("purchase-modal")
+  const itemId = modal.dataset.itemId
+  const purchaseType = modal.dataset.purchaseType
 
-    const iconSvgs = {
-        home: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>',
-        star: '<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>',
-        history: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
-        user: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>',
-    }
-
-    container.innerHTML = navItems
-        .map(
-            (item) => `
-        <div class="flex-1 flex flex-col items-center justify-center cursor-pointer transition-colors nav-item ${
-            document.getElementById(item.id).classList.contains("active")
-                ? "text-primary"
-                : "text-tg-hint hover:text-primary"
-        }" onclick="showPage('${item.id}', this)">
-            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                ${iconSvgs[item.icon]}
-            </svg>
-            <span class="text-xs font-medium">${item.label}</span>
-        </div>
-    `,
-        )
-        .join("")
-}
-
-function updateUserProfile() {
-    if (!currentUser) return
-
-    const profilePhoto = document.getElementById("profile-photo")
-    const profileName = document.getElementById("profile-name")
-    const profileUsername = document.getElementById("profile-username")
-    const profileBalance = document.getElementById("profile-balance")
-    const currentBalanceEl = document.getElementById("current-balance")
-    const adminBadge = document.getElementById("admin-badge")
-    const adminPanelItem = document.getElementById("admin-panel-item")
-
-    if (currentUser.photo_url) {
-        profilePhoto.src = currentUser.photo_url
-    } else {
-        profilePhoto.src = "https://via.placeholder.com/96x96"
-    }
-
-    profileName.textContent = `${currentUser.first_name}${currentUser.last_name ? " " + currentUser.last_name : ""}`
-
-    if (currentUser.username) {
-        profileUsername.textContent = `@${currentUser.username}`
-        profileUsername.classList.remove("hidden")
-    }
-
-    profileBalance.textContent = `${currentBalance} ⭐`
-    currentBalanceEl.textContent = `${currentBalance} Stars`
-
-    // Check if user is admin
-    if (ADMIN_IDS.includes(currentUser.id)) {
-        adminBadge.classList.remove("hidden")
-        adminPanelItem.classList.remove("hidden")
-    }
-
-    updateActiveChatCount()
-}
-
-// Event Handlers
-function showPage(pageId, navElement) {
-    // Hide all pages
-    document.querySelectorAll(".page").forEach((page) => {
-        page.classList.remove("active")
-        page.classList.add("hidden")
+  try {
+    const result = await apiCall("/purchases/create", {
+      method: "POST",
+      body: JSON.stringify({
+        item_id: itemId,
+        purchase_type: purchaseType,
+      }),
     })
 
-    // Show selected page
-    const targetPage = document.getElementById(pageId)
-    targetPage.classList.remove("hidden")
-    targetPage.classList.add("active")
+    closePurchaseModal()
+    showSuccess("Purchase successful!")
 
-    // Update navigation
-    if (navElement) {
-        document.querySelectorAll(".nav-item").forEach((item) => {
-            item.classList.remove("text-primary")
-            item.classList.add("text-tg-hint")
-        })
-        navElement.classList.remove("text-tg-hint")
-        navElement.classList.add("text-primary")
+    // Update user balance
+    if (currentUser) {
+      currentUser.balance = result.new_balance
+      updateProfileUI(currentUser)
     }
+  } catch (error) {
+    console.error("Purchase failed:", error)
+    showError("Purchase failed. Please try again.")
+  }
 }
 
-function filterAccounts(game) {
-    selectedFilter = game
-    renderAccounts()
-    renderFilterButtons()
+// Filter Functions
+function filterByCategory(categoryId) {
+  // Update button styles
+  document.querySelectorAll(".category-btn").forEach((btn) => {
+    btn.classList.remove("bg-tg-button", "text-white")
+    btn.classList.add("bg-tg-secondary-bg")
+  })
+
+  event.target.classList.remove("bg-tg-secondary-bg")
+  event.target.classList.add("bg-tg-button", "text-white")
+
+  // Filter items
+  loadItems(categoryId)
 }
 
-function filterTransactions(type) {
-    selectedFilter = type
-    const filteredTransactions = type === "all" ? transactions : transactions.filter((t) => t.type === type)
+// Chat Functions
+async function sendMessage() {
+  const input = document.getElementById("message-input")
+  const message = input.value.trim()
 
-    // Re-render with filtered data
-    const originalTransactions = transactions
-    transactions = filteredTransactions
-    renderTransactions()
-    transactions = originalTransactions
+  if (!message) return
 
-    renderHistoryFilters()
+  try {
+    await apiCall("/chat/send", {
+      method: "POST",
+      body: JSON.stringify({
+        message: message,
+        chat_type: "support",
+      }),
+    })
+
+    input.value = ""
+    loadChatMessages()
+  } catch (error) {
+    console.error("Failed to send message:", error)
+    showError("Failed to send message")
+  }
 }
 
-async function purchaseAccount(accountId) {
-    try {
-        const account = accounts.find((acc) => acc.id === accountId)
-        if (!account) {
-            throw new Error("Akkaunt topilmadi")
-        }
+async function loadChatMessages() {
+  try {
+    const messages = await apiCall("/chat/messages")
+    renderChatMessages(messages)
+  } catch (error) {
+    console.error("Failed to load messages:", error)
+  }
+}
 
-        const confirmed = confirm(`${account.title} akkauntini $${account.price}ga sotib olishni xohlaysizmi?`)
-        if (!confirmed) return
+function renderChatMessages(messages) {
+  const container = document.getElementById("chat-messages")
+  container.innerHTML = messages
+    .map(
+      (msg) => `
+        <div class="mb-4 ${msg.sender_id === currentUser?.id ? "text-right" : "text-left"}">
+            <div class="inline-block max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+              msg.sender_id === currentUser?.id ? "bg-tg-button text-white" : "bg-tg-secondary-bg"
+            }">
+                <p>${msg.message}</p>
+                <p class="text-xs opacity-70 mt-1">${new Date(msg.created_at).toLocaleTimeString()}</p>
+            </div>
+        </div>
+    `,
+    )
+    .join("")
 
-        const response = await apiRequest("/accounts/purchase", {
-            method: "POST",
-            body: JSON.stringify({ accountId }),
-        })
+  container.scrollTop = container.scrollHeight
+}
 
-        showNotification("Akkaunt muvaffaqiyatli sotib olindi!")
-        loadTransactions() // Refresh transaction history
-    } catch (error) {
-        showNotification("Xarid amalga oshmadi: " + error.message, "error")
+// Admin Functions
+async function showUserManagement() {
+  // Implementation for user management
+  showInfo("User management feature coming soon")
+}
+
+async function showRoleAssignment() {
+  // Implementation for role assignment
+  showInfo("Role assignment feature coming soon")
+}
+
+async function showAddItem() {
+  // Implementation for adding items
+  showInfo("Add item feature coming soon")
+}
+
+async function showManageItems() {
+  // Implementation for managing items
+  showInfo("Manage items feature coming soon")
+}
+
+// Utility Functions
+function updateProfileUI(user) {
+  const profilePhoto = document.getElementById("profile-photo")
+  const profileName = document.getElementById("profile-name")
+  const profileRole = document.getElementById("profile-role")
+  const userBalance = document.getElementById("user-balance")
+
+  if (user.photo_url) {
+    profilePhoto.src = user.photo_url
+  } else {
+    profilePhoto.src = "/placeholder.svg?height=96&width=96"
+  }
+
+  profileName.textContent = user.first_name + (user.last_name ? " " + user.last_name : "")
+  profileRole.textContent = user.role ? user.role.replace("_", " ").toUpperCase() : "USER"
+  userBalance.textContent = user.balance || 0
+}
+
+function showLoading(show) {
+  const indicator = document.getElementById("loading-indicator")
+  if (show) {
+    indicator.classList.remove("hidden")
+  } else {
+    indicator.classList.add("hidden")
+  }
+}
+
+function showError(message) {
+  tg.showAlert(message)
+}
+
+function showSuccess(message) {
+  tg.showAlert(message)
+}
+
+function showInfo(message) {
+  tg.showAlert(message)
+}
+
+async function buyStars(packageId) {
+  try {
+    const result = await apiCall("/payments/buy-stars", {
+      method: "POST",
+      body: JSON.stringify({
+        package_id: packageId,
+      }),
+    })
+
+    showSuccess("Stars purchased successfully!")
+
+    // Update user balance
+    if (currentUser) {
+      currentUser.balance = result.new_balance
+      updateProfileUI(currentUser)
     }
+  } catch (error) {
+    console.error("Failed to buy stars:", error)
+    showError("Failed to purchase stars")
+  }
 }
-
-async function purchaseStars(packageId) {
-    try {
-        const response = await apiRequest("/stars/purchase", {
-            method: "POST",
-            body: JSON.stringify({ packageId }),
-        })
-
-        currentBalance = response.newBalance
-        updateUserProfile()
-        showNotification("Stars muvaffaqiyatli sotib olindi!")
-    } catch (error) {
-        showNotification("Stars sotib olishda xatolik: " + error.message, "error")
-    }
-}
-
-function addToCart(accountId) {
-    const account = accounts.find((acc) => acc.id === accountId)
-    if (account) {
-        showNotification(`${account.title} savatga qo'shildi`)
-    }
-}
-
-function requestUserPhone() {
-    if (tg && tg.requestPhone) {
-        tg.requestPhone()
-    }
-}
-
-// Initialize Application
-document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        // Initialize Telegram WebApp
-        if (tg.ready) {
-            tg.ready()
-            tg.setHeaderColor && tg.setHeaderColor("secondary_bg_color")
-            tg.setBackgroundColor && tg.setBackgroundColor("secondary_bg_color")
-            tg.expand && tg.expand()
-        }
-
-        // Modal event listeners
-        document.getElementById("close-modal").addEventListener("click", closeAccountModal)
-        document.getElementById("close-chat").addEventListener("click", closeChatModal)
-
-        // Admin menu
-        document.getElementById("admin-menu-btn").addEventListener("click", (e) => {
-            e.stopPropagation()
-            const menu = document.getElementById("admin-menu")
-            menu.classList.toggle("active")
-        })
-
-        document.getElementById("complete-sale-btn").addEventListener("click", completeSale)
-
-        // Purchase buttons
-        document.getElementById("direct-purchase-btn").addEventListener("click", () => {
-            if (currentAccountModal) {
-                purchaseAccount(currentAccountModal.id)
-            }
-        })
-
-        document.getElementById("admin-purchase-btn").addEventListener("click", () => {
-            if (currentAccountModal) {
-                openChatModal(currentAccountModal.id)
-            }
-        })
-
-        // Chat functionality
-        document.getElementById("send-message").addEventListener("click", sendChatMessage)
-        document.getElementById("chat-input").addEventListener("keypress", (e) => {
-            if (e.key === "Enter") {
-                sendChatMessage()
-            }
-        })
-
-        // Close modals when clicking outside
-        document.addEventListener("click", (e) => {
-            if (e.target.classList.contains("modal")) {
-                if (e.target.id === "account-modal") closeAccountModal()
-                if (e.target.id === "chat-modal") closeChatModal()
-            }
-
-            // Close admin menu when clicking outside
-            if (!e.target.closest("#admin-menu-container")) {
-                document.getElementById("admin-menu").classList.remove("active")
-            }
-        })
-
-        // Authenticate user
-        await authenticateUser()
-
-        // Load initial data
-        await Promise.all([loadAccounts(), loadTransactions()])
-
-        // Render UI components
-        renderCarousel()
-        renderFilterButtons()
-        renderStarPackages()
-        renderHistoryFilters()
-        renderBottomNavigation()
-
-        // Initialize Swiper
-        if (window.Swiper) {
-            new window.Swiper(".swiper", {
-                loop: true,
-                autoplay: {
-                    delay: 3000,
-                    disableOnInteraction: false,
-                },
-                pagination: {
-                    el: ".swiper-pagination",
-                    clickable: true,
-                },
-            })
-        }
-
-        // Show home page by default
-        showPage("home-page", document.querySelector(".nav-item"))
-    } catch (error) {
-        console.error("Initialization error:", error)
-        showNotification("Ilovani yuklashda xatolik yuz berdi", "error")
-    }
-})
