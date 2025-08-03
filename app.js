@@ -8,14 +8,26 @@ let currentCategories = []
 const Swiper = window.Swiper // Declare Swiper variable
 
 // Declare functions before using them
-function navigateTo(page) {
-  // Implementation for navigating to a page
-  console.log("Navigating to:", page)
+function navigateTo(view) {
+  navigationStack.push(view)
+  updateUI(view)
 }
 
 function handleBackPress() {
-  // Implementation for handling back button press
-  console.log("Back button clicked")
+  if (navigationStack.length > 1) {
+    const currentView = navigationStack.pop()
+    if (currentView.type === "modal") {
+      const modal = document.getElementById(currentView.id)
+      if (modal) {
+        modal.classList.remove("opacity-100")
+        setTimeout(() => {
+          modal.classList.add("hidden")
+        }, 300)
+      }
+    }
+    const previousView = navigationStack[navigationStack.length - 1]
+    updateUI(previousView)
+  }
 }
 
 async function loadCategories() {
@@ -33,24 +45,38 @@ function renderBanners(banners) {
   container.innerHTML = banners
     .map(
       (banner) => `
-        <div class="banner">
-            <img src="${banner.image_url}" alt="${banner.title}">
-            <h2>${banner.title}</h2>
+        <div class="swiper-slide">
+            <img src="${banner.image_url}" class="w-full h-full object-cover" alt="${banner.title}">
         </div>
     `,
     )
     .join("")
+
+  // Initialize Swiper
+  if (window.Swiper) {
+    new window.Swiper(".swiper", {
+      loop: true,
+      autoplay: { delay: 3000 },
+      pagination: {
+        el: ".swiper-pagination",
+      },
+    })
+  }
 }
 
 function renderStarPackages(packages) {
-  const container = document.getElementById("star-packages-container")
+  const container = document.getElementById("star-packages")
   container.innerHTML = packages
     .map(
       (pkg) => `
-        <div class="star-package">
-            <p>${pkg.description}</p>
-            <p>Price: $${pkg.price}</p>
-            <button onclick="buyStars('${pkg._id}')">Buy</button>
+        <div class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center">
+            <div>
+                <h3 class="font-bold">${pkg.stars} Stars</h3>
+                <p class="text-tg-hint text-sm">${pkg.description}</p>
+            </div>
+            <button onclick="buyStars('${pkg._id}')" class="bg-tg-button text-white px-4 py-2 rounded-lg">
+                $${pkg.price}
+            </button>
         </div>
     `,
     )
@@ -137,7 +163,7 @@ function initializeNavigation() {
     {
       id: "history-page",
       label: "History",
-      icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>',
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>',
     },
     {
       id: "profile-page",
@@ -191,12 +217,20 @@ function initializeNavigation() {
 
 function initializeEventListeners() {
   // Message sending
-  document.getElementById("send-message-btn").addEventListener("click", sendMessage)
-  document.getElementById("message-input").addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      sendMessage()
-    }
-  })
+  const sendBtn = document.getElementById("send-message-btn")
+  const messageInput = document.getElementById("message-input")
+
+  if (sendBtn) {
+    sendBtn.addEventListener("click", sendMessage)
+  }
+
+  if (messageInput) {
+    messageInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        sendMessage()
+      }
+    })
+  }
 }
 
 async function loadInitialData() {
@@ -284,15 +318,23 @@ async function loadItems(category = null) {
 function renderCategories(categories) {
   const container = document.getElementById("category-filters")
   container.innerHTML = `
-        <button onclick="filterByCategory(null)" class="category-btn bg-tg-button text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">All</button>
-        ${categories
-          .map(
-            (cat) => `
-            <button onclick="filterByCategory('${cat.name}')" class="category-btn bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">${cat.name}</button>
-        `,
-          )
-          .join("")}
-    `
+    <button data-category="all" class="category-btn bg-tg-button text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">All</button>
+    ${categories
+      .map(
+        (cat) => `
+        <button data-category="${cat.name}" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">${cat.name}</button>
+    `,
+      )
+      .join("")}
+  `
+
+  // Add event listeners to category buttons
+  container.querySelectorAll(".category-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const category = e.target.getAttribute("data-category")
+      filterByCategory(category === "all" ? null : category)
+    })
+  })
 }
 
 async function loadBanners() {
@@ -334,10 +376,12 @@ async function loadMyPurchases() {
 // Render Functions
 function renderItems(items) {
   const container = document.getElementById("card-container")
+  if (!container) return
+
   container.innerHTML = items
     .map(
       (item, index) => `
-        <div onclick="openModal('${item._id}')" class="flex flex-col rounded-2xl ${item.is_admin_item ? "bg-blue-900/40" : "bg-tg-bg"} overflow-hidden transition-transform active:scale-95 cursor-pointer opacity-0" style="animation: fade-in 0.5s ease forwards ${index * 0.1}s;">
+        <div onclick="openModal('${item._id}')" class="flex flex-col rounded-2xl ${item.is_admin_item ? "bg-blue-900/40" : "bg-tg-secondary-bg"} overflow-hidden transition-transform active:scale-95 cursor-pointer opacity-0" style="animation: fade-in 0.5s ease forwards ${index * 0.1}s;">
             <img class="w-full h-auto aspect-square object-cover" src="${item.image_url || "/placeholder.svg?height=200&width=200"}" alt="${item.title}">
             <div class="p-3">
                 <p class="font-semibold truncate">${item.title}</p>
@@ -363,104 +407,97 @@ function renderItems(items) {
 }
 
 // Filter Functions
-function filterByCategory(categoryId) {
+function filterByCategory(categoryName) {
+  console.log("Filtering by category:", categoryName)
+
   // Update button styles
   document.querySelectorAll(".category-btn").forEach((btn) => {
     btn.classList.remove("bg-tg-button", "text-white")
-    btn.classList.add("bg-tg-secondary-bg")
+    btn.classList.add("bg-tg-secondary-bg", "text-tg-text")
   })
 
-  // Find the clicked button and update its style
-  const clickedButton =
-    document.querySelector(`[onclick="filterByCategory('${categoryId}')"]`) ||
-    document.querySelector(`[onclick="filterByCategory(null)"]`)
+  // Find and highlight the active button
+  const activeButton = categoryName
+    ? document.querySelector(`[data-category="${categoryName}"]`)
+    : document.querySelector(`[data-category="all"]`)
 
-  if (clickedButton) {
-    clickedButton.classList.remove("bg-tg-secondary-bg")
-    clickedButton.classList.add("bg-tg-button", "text-white")
+  if (activeButton) {
+    activeButton.classList.remove("bg-tg-secondary-bg", "text-tg-text")
+    activeButton.classList.add("bg-tg-button", "text-white")
   }
 
   // Filter items
-  if (categoryId) {
-    const filteredItems = currentItems.filter((item) => item.category && item.category.name === categoryId)
-    renderItems(filteredItems)
-  } else {
-    renderItems(currentItems)
+  let filteredItems = currentItems
+  if (categoryName) {
+    filteredItems = currentItems.filter((item) => item.category && item.category.name === categoryName)
   }
+
+  renderItems(filteredItems)
 }
 
-// Chat Functions
-async function sendMessage() {
-  const input = document.getElementById("message-input")
-  const message = input.value.trim()
+// Item Functions
+function openModal(itemId) {
+  const item = currentItems.find((i) => i._id === itemId)
+  if (!item) return
 
-  if (!message) return
+  const modal = document.getElementById("item-modal")
+  if (!modal) return
 
-  try {
-    await apiCall("/chat/send", {
-      method: "POST",
-      body: JSON.stringify({
-        message: message,
-        chat_type: "support",
-      }),
-    })
-
-    input.value = ""
-    loadChatMessages()
-  } catch (error) {
-    console.error("Failed to send message:", error)
-    showError("Failed to send message")
-  }
-}
-
-async function loadChatMessages() {
-  try {
-    const messages = await apiCall("/chat/messages")
-    renderChatMessages(messages)
-  } catch (error) {
-    console.error("Failed to load messages:", error)
-  }
-}
-
-function renderChatMessages(messages) {
-  const container = document.getElementById("chat-messages")
-  container.innerHTML = messages
-    .map(
-      (msg) => `
-        <div class="mb-4 ${msg.sender_id === currentUser?.id ? "text-right" : "text-left"}">
-            <div class="inline-block max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-              msg.sender_id === currentUser?.id ? "bg-tg-button text-white" : "bg-tg-secondary-bg"
-            }">
-                <p>${msg.message}</p>
-                <p class="text-xs opacity-70 mt-1">${new Date(msg.created_at).toLocaleTimeString()}</p>
+  modal.innerHTML = `
+    <div class="h-full w-full flex flex-col">
+        <div class="flex-grow overflow-y-auto">
+            <img src="${item.image_url}" class="w-full aspect-square object-cover" alt="${item.title}">
+            <div class="p-4">
+                <h2 class="text-3xl font-bold mb-2">${item.title}</h2>
+                <p class="text-lg text-tg-hint mb-4">#${item.item_id}</p>
+                <p class="text-base leading-relaxed mb-4">${item.description}</p>
+                <div class="bg-tg-secondary-bg p-3 rounded-lg">
+                    <p class="text-sm text-tg-hint mb-1">Category</p>
+                    <p class="font-medium">${item.category?.name || "General"}</p>
+                </div>
             </div>
         </div>
-    `,
-    )
-    .join("")
-
-  container.scrollTop = container.scrollHeight
+        <footer class="flex-shrink-0 p-4 border-t border-gray-700/50 bg-tg-bg">
+            ${
+              item.is_admin_item
+                ? `<button onclick="showPurchaseModal('${item._id}', 'admin')" class="w-full bg-tg-button text-white font-bold py-4 rounded-xl">Buy via Admin (${item.price} Stars)</button>`
+                : `<div class="flex gap-3">
+                    <button onclick="showPurchaseModal('${item._id}', 'direct')" class="flex-1 bg-white/10 text-tg-text font-bold py-4 rounded-xl">Direct Purchase</button>
+                    <button onclick="showPurchaseModal('${item._id}', 'admin')" class="flex-1 bg-tg-button text-white font-bold py-4 rounded-xl">Via Admin</button>
+                </div>`
+            }
+        </footer>
+    </div>`
+  navigateTo({ type: "modal", id: "item-modal" })
 }
 
-// Admin Functions
-async function showUserManagement() {
-  // Implementation for user management
-  showInfo("User management feature coming soon")
+function showPurchaseModal(itemId, type) {
+  const item = currentItems.find((i) => i._id === itemId)
+  if (!item) return
+
+  const modal = document.getElementById("purchase-modal")
+  const details = document.getElementById("purchase-details")
+
+  if (!modal || !details) return
+
+  details.innerHTML = `
+    <div class="text-center">
+        <h4 class="font-bold mb-2">${item.title}</h4>
+        <p class="text-2xl font-bold text-tg-link mb-2">${item.price} Stars</p>
+        <p class="text-sm text-tg-hint">Purchase Type: ${type === "admin" ? "Via Admin" : "Direct"}</p>
+    </div>
+  `
+
+  modal.classList.remove("hidden")
+  modal.dataset.itemId = itemId
+  modal.dataset.purchaseType = type
 }
 
-async function showRoleAssignment() {
-  // Implementation for role assignment
-  showInfo("Role assignment feature coming soon")
-}
-
-async function showAddItem() {
-  // Implementation for adding items
-  showInfo("Add item feature coming soon")
-}
-
-async function showManageItems() {
-  // Implementation for managing items
-  showInfo("Manage items feature coming soon")
+function closePurchaseModal() {
+  const modal = document.getElementById("purchase-modal")
+  if (modal) {
+    modal.classList.add("hidden")
+  }
 }
 
 // Utility Functions
@@ -470,60 +507,59 @@ function updateProfileUI(user) {
   const profileRole = document.getElementById("profile-role")
   const userBalance = document.getElementById("user-balance")
 
-  if (user.photo_url) {
-    profilePhoto.src = user.photo_url
-  } else {
-    profilePhoto.src = "/placeholder.svg?height=96&width=96"
+  if (profilePhoto) {
+    profilePhoto.src = user.photo_url || "/placeholder.svg?height=96&width=96"
   }
 
-  profileName.textContent = user.first_name + (user.last_name ? " " + user.last_name : "")
-  profileRole.textContent = user.role ? user.role.replace("_", " ").toUpperCase() : "USER"
-  userBalance.textContent = user.balance || 0
+  if (profileName) {
+    profileName.textContent = user.first_name + (user.last_name ? " " + user.last_name : "")
+  }
+
+  if (profileRole) {
+    profileRole.textContent = user.role ? user.role.replace("_", " ").toUpperCase() : "USER"
+  }
+
+  if (userBalance) {
+    userBalance.textContent = user.balance || 0
+  }
 }
 
 function showLoading(show) {
   const indicator = document.getElementById("loading-indicator")
-  if (show) {
-    indicator.classList.remove("hidden")
-  } else {
-    indicator.classList.add("hidden")
+  if (indicator) {
+    if (show) {
+      indicator.classList.remove("hidden")
+    } else {
+      indicator.classList.add("hidden")
+    }
   }
 }
 
 function showError(message) {
-  tg.showAlert(message)
-}
-
-function showSuccess(message) {
-  tg.showAlert(message)
-}
-
-function showInfo(message) {
-  tg.showAlert(message)
-}
-
-async function buyStars(packageId) {
-  try {
-    const result = await apiCall("/payments/buy-stars", {
-      method: "POST",
-      body: JSON.stringify({
-        package_id: packageId,
-      }),
-    })
-
-    showSuccess("Stars purchased successfully!")
-
-    // Update user balance
-    if (currentUser) {
-      currentUser.balance = result.new_balance
-      updateProfileUI(currentUser)
-    }
-  } catch (error) {
-    console.error("Failed to buy stars:", error)
-    showError("Failed to purchase stars")
+  if (tg && tg.showAlert) {
+    tg.showAlert(message)
+  } else {
+    alert(message)
   }
 }
 
+function showSuccess(message) {
+  if (tg && tg.showAlert) {
+    tg.showAlert(message)
+  } else {
+    alert(message)
+  }
+}
+
+function showInfo(message) {
+  if (tg && tg.showAlert) {
+    tg.showAlert(message)
+  } else {
+    alert(message)
+  }
+}
+
+// Sample data loading
 function loadSampleData() {
   // Sample categories
   const sampleCategories = [
@@ -644,4 +680,110 @@ function loadSampleData() {
   renderStarPackages(sampleStarPackages)
 
   console.log("Sample data loaded successfully")
+}
+
+// Stub functions for missing functionality
+async function sendMessage() {
+  console.log("Sending message")
+}
+
+async function buyStars(packageId) {
+  try {
+    const result = await apiCall("/payments/buy-stars", {
+      method: "POST",
+      body: JSON.stringify({
+        package_id: packageId,
+      }),
+    })
+
+    showSuccess("Stars purchased successfully!")
+
+    // Update user balance
+    if (currentUser) {
+      currentUser.balance = result.new_balance
+      updateProfileUI(currentUser)
+    }
+  } catch (error) {
+    console.error("Failed to buy stars:", error)
+    showError("Failed to purchase stars")
+  }
+}
+
+function confirmPurchase() {
+  console.log("Confirming purchase")
+  closePurchaseModal()
+}
+
+// Admin functions
+function showUserManagement() {
+  showInfo("User management feature coming soon")
+}
+
+function showRoleAssignment() {
+  showInfo("Role assignment feature coming soon")
+}
+
+function showAddItem() {
+  showInfo("Add item feature coming soon")
+}
+
+function showManageItems() {
+  showInfo("Manage items feature coming soon")
+}
+
+// Navigation Functions
+function updateUI(view) {
+  document.querySelectorAll(".page, #item-modal").forEach((el) => el.classList.add("hidden"))
+  document.querySelectorAll("#profile-main, #help-subpage").forEach((el) => el.classList.add("hidden"))
+
+  const bottomNav = document.getElementById("bottom-nav")
+
+  if (view.type === "page") {
+    const pageEl = document.getElementById(view.id)
+    if (pageEl) {
+      pageEl.classList.remove("hidden")
+      if (view.id === "profile-page") {
+        const profileMain = pageEl.querySelector("#profile-main")
+        if (profileMain) {
+          profileMain.classList.remove("hidden")
+        }
+      }
+      if (view.id === "history-page") {
+        loadPurchaseHistory()
+      }
+      if (view.id === "my-purchases-page") {
+        loadMyPurchases()
+      }
+    }
+    if (bottomNav) {
+      bottomNav.classList.remove("hidden")
+    }
+  } else if (view.type === "modal") {
+    const modalEl = document.getElementById(view.id)
+    if (modalEl) {
+      modalEl.classList.remove("hidden")
+      setTimeout(() => modalEl.classList.add("opacity-100"), 10)
+    }
+    if (bottomNav) {
+      bottomNav.classList.add("hidden")
+    }
+  } else if (view.type === "subpage") {
+    const parentPage = document.getElementById("profile-page")
+    if (parentPage) {
+      parentPage.classList.remove("hidden")
+    }
+    const subpage = document.getElementById(view.id)
+    if (subpage) {
+      subpage.classList.remove("hidden")
+    }
+    if (bottomNav) {
+      bottomNav.classList.add("hidden")
+    }
+  }
+
+  if (navigationStack.length > 1) {
+    tg.BackButton.show()
+  } else {
+    tg.BackButton.hide()
+  }
 }
