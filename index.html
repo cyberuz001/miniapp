@@ -100,7 +100,15 @@
                 <!-- Banner Section -->
                 <div class="swiper h-48">
                     <div class="swiper-wrapper" id="banner-container">
-                        <!-- Banners will be loaded here -->
+                        <div class="swiper-slide">
+                            <img src="https://via.placeholder.com/600x360/2ea6ff/ffffff?text=Top+Games+Sale" class="w-full h-full object-cover rounded-lg" alt="Top Games Sale">
+                        </div>
+                        <div class="swiper-slide">
+                            <img src="https://via.placeholder.com/600x360/e91e63/ffffff?text=Special+Offer" class="w-full h-full object-cover rounded-lg" alt="Special Offer">
+                        </div>
+                        <div class="swiper-slide">
+                            <img src="https://via.placeholder.com/600x360/4caf50/ffffff?text=New+Arrivals" class="w-full h-full object-cover rounded-lg" alt="New Arrivals">
+                        </div>
                     </div>
                     <div class="swiper-pagination"></div>
                 </div>
@@ -108,11 +116,11 @@
                 <!-- Categories -->
                 <div class="px-4 py-3">
                     <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2" id="category-filters">
-                        <button onclick="filterItems('all')" class="category-btn active bg-tg-button text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">All</button>
-                        <button onclick="filterItems('PUBG')" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">PUBG</button>
-                        <button onclick="filterItems('Free Fire')" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Free Fire</button>
-                        <button onclick="filterItems('Mobile Legend')" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Mobile Legend</button>
-                        <button onclick="filterItems('CSGO')" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">CSGO</button>
+                        <button data-category="all" class="category-btn active bg-tg-button text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">All</button>
+                        <button data-category="PUBG" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">PUBG</button>
+                        <button data-category="Free Fire" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Free Fire</button>
+                        <button data-category="Mobile Legend" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Mobile Legend</button>
+                        <button data-category="CSGO" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">CSGO</button>
                     </div>
                 </div>
                 
@@ -209,28 +217,28 @@
         
         <!-- Bottom Navigation -->
         <nav id="bottom-nav" class="bg-tg-secondary-bg/90 backdrop-blur-xl border-t border-gray-700/50 flex justify-around items-center">
-            <div onclick="showPage('home-page')" class="nav-item active flex-1 flex flex-col items-center justify-center cursor-pointer py-2">
+            <div data-page="home-page" class="nav-item active flex-1 flex flex-col items-center justify-center cursor-pointer py-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                 </svg>
                 <span class="text-xs font-medium">Home</span>
             </div>
             
-            <div onclick="showPage('buy-stars-page')" class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint py-2">
+            <div data-page="buy-stars-page" class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint py-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
                 </svg>
                 <span class="text-xs font-medium">Buy Stars</span>
             </div>
             
-            <div onclick="showPage('history-page')" class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint py-2">
+            <div data-page="history-page" class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint py-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18.75V7.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 7.5v1.51z" />
                 </svg>
                 <span class="text-xs font-medium">History</span>
             </div>
             
-            <div onclick="showPage('profile-page')" class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint py-2">
+            <div data-page="profile-page" class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint py-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
@@ -239,6 +247,299 @@
         </nav>
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        // Global variables
+        let currentItems = [];
+        let filteredItems = [];
+
+        // Sample items data
+        const sampleItems = [
+            {
+                id: "1001",
+                title: "PUBG Conqueror Account",
+                description: "High-tier PUBG Mobile account with Conqueror rank, rare skins, and premium items.",
+                price: 150,
+                image: "https://via.placeholder.com/300x300/2ea6ff/ffffff?text=PUBG+Conqueror",
+                category: "PUBG",
+                isAdmin: true,
+            },
+            {
+                id: "1002",
+                title: "Free Fire Diamond Account",
+                description: "Free Fire account with 50,000+ diamonds and exclusive characters.",
+                price: 80,
+                image: "https://via.placeholder.com/300x300/e91e63/ffffff?text=Free+Fire+Diamond",
+                category: "Free Fire",
+                isAdmin: false,
+            },
+            {
+                id: "1003",
+                title: "PUBG UC Account",
+                description: "PUBG Mobile account with 8100 UC and premium battle pass.",
+                price: 120,
+                image: "https://via.placeholder.com/300x300/4caf50/ffffff?text=PUBG+UC",
+                category: "PUBG",
+                isAdmin: true,
+            },
+            {
+                id: "1004",
+                title: "Free Fire Elite Pass",
+                description: "Free Fire account with Elite Pass and rare bundles.",
+                price: 45,
+                image: "https://via.placeholder.com/300x300/ff9800/ffffff?text=FF+Elite",
+                category: "Free Fire",
+                isAdmin: false,
+            },
+            {
+                id: "1005",
+                title: "Mobile Legend Mythic",
+                description: "Mobile Legend account with Mythic rank and rare skins.",
+                price: 200,
+                image: "https://via.placeholder.com/300x300/9c27b0/ffffff?text=ML+Mythic",
+                category: "Mobile Legend",
+                isAdmin: true,
+            },
+            {
+                id: "1006",
+                title: "CSGO Prime Account",
+                description: "CSGO Prime account with rare skins and high rank.",
+                price: 300,
+                image: "https://via.placeholder.com/300x300/f44336/ffffff?text=CSGO+Prime",
+                category: "CSGO",
+                isAdmin: false,
+            },
+        ];
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('App initializing...');
+            
+            // Initialize Telegram WebApp
+            if (window.Telegram && window.Telegram.WebApp) {
+                const tg = window.Telegram.WebApp;
+                tg.ready();
+                tg.expand();
+            }
+
+            // Load sample data
+            currentItems = sampleItems;
+            filteredItems = sampleItems;
+            renderItems(sampleItems);
+
+            // Initialize Swiper
+            if (window.Swiper) {
+                setTimeout(() => {
+                    new window.Swiper('.swiper', {
+                        loop: true,
+                        autoplay: {
+                            delay: 3000,
+                            disableOnInteraction: false,
+                        },
+                        pagination: {
+                            el: '.swiper-pagination',
+                            clickable: true,
+                        },
+                        effect: 'slide',
+                        speed: 500,
+                    });
+                    console.log('Swiper initialized');
+                }, 500);
+            }
+
+            // Initialize navigation
+            initializeNavigation();
+            
+            // Initialize category filters
+            initializeCategoryFilters();
+
+            console.log('App initialized successfully');
+        });
+
+        // Navigation function
+        function initializeNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const pageId = this.getAttribute('data-page');
+                    showPage(pageId);
+                });
+            });
+        }
+
+        // Show page function
+        function showPage(pageId) {
+            console.log('Showing page:', pageId);
+
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            // Update navigation active state
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                item.classList.add('text-tg-hint');
+            });
+
+            // Find and activate current nav item
+            const currentNavItem = document.querySelector(`[data-page="${pageId}"]`);
+            if (currentNavItem) {
+                currentNavItem.classList.add('active');
+                currentNavItem.classList.remove('text-tg-hint');
+            }
+        }
+
+        // Category filters
+        function initializeCategoryFilters() {
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    filterItems(category);
+                });
+            });
+        }
+
+        // Filter items function
+        function filterItems(category) {
+            console.log('Filtering by category:', category);
+
+            // Update button styles
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('bg-tg-button', 'text-white', 'active');
+                btn.classList.add('bg-tg-secondary-bg', 'text-tg-text');
+            });
+
+            // Find and activate the correct button
+            const activeButton = document.querySelector(`[data-category="${category}"]`);
+            if (activeButton) {
+                activeButton.classList.remove('bg-tg-secondary-bg', 'text-tg-text');
+                activeButton.classList.add('bg-tg-button', 'text-white', 'active');
+            }
+
+            // Filter items
+            let itemsToShow = currentItems;
+            if (category !== 'all') {
+                itemsToShow = currentItems.filter(item => item.category === category);
+            }
+
+            renderItems(itemsToShow);
+        }
+
+        // Render items function
+        function renderItems(items) {
+            const container = document.getElementById('items-container');
+            if (!container) return;
+
+            container.innerHTML = items.map((item, index) => `
+                <div onclick="openItemModal('${item.id}')" class="flex flex-col rounded-2xl ${item.isAdmin ? 'bg-blue-900/40' : 'bg-tg-secondary-bg'} overflow-hidden transition-transform active:scale-95 cursor-pointer opacity-0" style="animation: fade-in 0.5s ease forwards ${index * 0.1}s;">
+                    <img class="w-full h-auto aspect-square object-cover" src="${item.image}" alt="${item.title}">
+                    <div class="p-3">
+                        <p class="font-semibold truncate">${item.title}</p>
+                        <p class="text-xs text-tg-hint">#${item.id}</p>
+                        <div class="flex justify-between items-center mt-3">
+                            <div class="flex items-center gap-1.5 bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-bold py-2 px-3 rounded-lg">
+                                <svg class="w-4 h-4" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8 0L0 4.66667V14L8 9.33333L16 14V4.66667L8 0Z" fill="white"/>
+                                </svg>
+                                ${item.price}
+                            </div>
+                            <div class="w-9 h-9 flex items-center justify-center bg-white/10 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-white">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c.51 0 .962-.328 1.093-.826l1.821-6.831c.13-.483-.145-.996-.644-1.17a48.11 48.11 0 00-1.821-.545A48.11 48.11 0 007.5 4.5M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Open item modal
+        function openItemModal(itemId) {
+            const item = currentItems.find(i => i.id === itemId);
+            if (!item) return;
+
+            console.log('Opening modal for item:', item.title);
+
+            // Create modal HTML
+            const modalHTML = `
+                <div class="fixed inset-0 bg-black/50 z-50 flex items-end justify-center p-4" onclick="closeModal(event)">
+                    <div class="bg-tg-bg rounded-t-3xl w-full max-w-md max-h-[80vh] overflow-hidden" onclick="event.stopPropagation()">
+                        <div class="p-4 border-b border-gray-700/50">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-lg font-bold">Item Details</h3>
+                                <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-700/50">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="overflow-y-auto max-h-96">
+                            <img src="${item.image}" class="w-full aspect-square object-cover" alt="${item.title}">
+                            <div class="p-4">
+                                <h2 class="text-xl font-bold mb-2">${item.title}</h2>
+                                <p class="text-tg-hint mb-2">#${item.id}</p>
+                                <p class="text-sm leading-relaxed mb-4">${item.description}</p>
+                                <div class="bg-tg-secondary-bg p-3 rounded-lg mb-4">
+                                    <p class="text-sm text-tg-hint mb-1">Category</p>
+                                    <p class="font-medium">${item.category}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 border-t border-gray-700/50">
+                            <button onclick="purchaseItem('${item.id}')" class="w-full bg-tg-button text-white font-bold py-3 rounded-xl">
+                                Buy for ${item.price} Stars
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Add modal to body
+            const modalDiv = document.createElement('div');
+            modalDiv.id = 'item-modal';
+            modalDiv.innerHTML = modalHTML;
+            document.body.appendChild(modalDiv);
+        }
+
+        // Close modal
+        function closeModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+
+            const modal = document.getElementById('item-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Purchase item
+        function purchaseItem(itemId) {
+            const item = currentItems.find(i => i.id === itemId);
+            if (!item) return;
+
+            console.log('Purchasing item:', item.title);
+
+            // Show success message
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.showAlert(`Successfully purchased ${item.title} for ${item.price} stars!`);
+            } else {
+                alert(`Successfully purchased ${item.title} for ${item.price} stars!`);
+            }
+
+            closeModal();
+        }
+
+        console.log('Script loaded successfully');
+    </script>
 </body>
 </html>
