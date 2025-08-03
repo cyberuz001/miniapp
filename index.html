@@ -32,9 +32,18 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         body { overflow: hidden; }
-        main { height: 100%; }
-        .page { display: none; height: 100%;}
-        .page.active { display: flex; flex-direction: column; }
+
+        /* Sahifalarni sukut bo'yicha yashirish */
+        .page {
+            display: none;
+        }
+        
+        /* Aktiv sahifa flex konteyner bo'lib, ota-onasining to'liq balandligini egallasin */
+        .page.active {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
 
         .carousel-container .swiper-button-next, .carousel-container .swiper-button-prev { color: #fff; }
         .carousel-container .swiper-pagination-bullet-active { background: #fff; }
@@ -45,32 +54,31 @@
     <div id="app" class="h-screen w-screen flex flex-col">
         <main class="flex-grow overflow-y-auto">
             <div id="home-page" class="page active">
-                <div class="flex-shrink-0">
-                    <div class="swiper h-48">
-                        <div class="swiper-wrapper">
-                            <div class="swiper-slide"><img src="https://via.placeholder.com/600x360/2ea6ff/ffffff?text=Top+O'yinlar" class="w-full h-full object-cover"></div>
-                            <div class="swiper-slide"><img src="https://via.placeholder.com/600x360/333333/ffffff?text=Aksiya" class="w-full h-full object-cover"></div>
-                        </div>
+                <div class="swiper h-48 flex-shrink-0">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide"><img src="https://via.placeholder.com/600x360/2ea6ff/ffffff?text=Top+O'yinlar" class="w-full h-full object-cover"></div>
+                        <div class="swiper-slide"><img src="https://via.placeholder.com/600x360/333333/ffffff?text=Aksiya" class="w-full h-full object-cover"></div>
                     </div>
-                    <div class="px-4 py-3"><div id="category-container" class="flex gap-2 overflow-x-auto no-scrollbar pb-2"></div></div>
-                    <div class="flex justify-between items-center px-4 pt-1 pb-3"><h2 class="text-2xl font-bold tracking-tight" data-translate-key="all_items"></h2></div>
                 </div>
+                <div class="px-4 py-3 flex-shrink-0"><div id="category-container" class="flex gap-2 overflow-x-auto no-scrollbar pb-2"></div></div>
+                <div class="flex justify-between items-center px-4 pt-1 pb-3 flex-shrink-0"><h2 class="text-2xl font-bold tracking-tight" data-translate-key="all_items"></h2></div>
                 <div id="card-container" class="px-4 pb-4 grid grid-cols-2 gap-4 overflow-y-auto"></div>
             </div>
 
-            <div id="buy-stars-page" class="page p-4 text-center justify-center items-center"><h2 class="text-xl font-bold" data-translate-key="buy_stars"></h2><p class="text-tg-hint mt-2" data-translate-key="buy_stars_desc"></p></div>
-            <div id="history-page" class="page p-4 text-center justify-center items-center"><h2 class="text-xl font-bold" data-translate-key="history"></h2><p class="text-tg-hint mt-2" data-translate-key="history_desc"></p></div>
+            <div id="buy-stars-page" class="page p-4 text-center items-center justify-center"><h2 class="text-xl font-bold mt-10" data-translate-key="buy_stars"></h2><p class="text-tg-hint mt-2" data-translate-key="coming_soon"></p></div>
+            <div id="history-page" class="page p-4 text-center items-center justify-center"><h2 class="text-xl font-bold mt-10" data-translate-key="history"></h2><p class="text-tg-hint mt-2" data-translate-key="no_history"></p></div>
             <div id="profile-page" class="page overflow-y-auto">
                 <div class="flex flex-col items-center p-6"><img id="profile-photo" class="w-24 h-24 rounded-full border-2 border-tg-link"><h2 id="profile-name" class="text-2xl font-bold mt-4"></h2></div>
                 <div class="px-4 flex flex-col gap-3">
-                    <div id="my-purchases-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer active:scale-[0.98]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0c.013.016.025.032.037.048a2.25 2.25 0 11-3.498-2.601m-8.502 2.553A2.25 2.25 0 118.498 16.17c.012-.016.024-.032.037-.048"></path></svg><span data-translate-key="my_purchases"></span></div></div>
-                    <div id="help-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer active:scale-[0.98]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"></path></svg><span data-translate-key="help"></span></div></div>
-                    <div id="support-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer active:scale-[0.98]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 11.25l2.25 2.25 4.5-4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><span data-translate-key="support"></span></div></div>
-                    <div id="language-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer active:scale-[0.98]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"></path></svg><span data-translate-key="language"></span></div></div>
+                    <div id="my-purchases-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer active:scale-[0.98]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c.51 0 .962-.328 1.093-.826l1.821-6.831c.13-.483-.145-.996-.644-1.17a48.11 48.11 0 00-1.821-.545A48.11 48.11 0 007.5 4.5M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" /></svg><span class="font-medium" data-translate-key="my_purchases"></span></div><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>
+                    <div id="help-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer active:scale-[0.98]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg><span class="font-medium" data-translate-key="help"></span></div><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>
+                    <div id="support-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer active:scale-[0.98]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.325 3.218.086 6.533-.533 9.491-2.311A2.25 2.25 0 0021 18.75V7.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 7.5v1.51z" /></svg><span class="font-medium" data-translate-key="support"></span></div><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>
+                    <div id="language-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer active:scale-[0.98]"><div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502Z" /></svg><span class="font-medium" data-translate-key="language"></span></div><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg></div>
                 </div>
             </div>
-            <div id="my-purchases-page" class="page p-4 overflow-y-auto"><h2 class="text-xl font-bold mb-4 flex-shrink-0" data-translate-key="my_purchases"></h2><div id="my-purchases-container" class="flex flex-col gap-3"></div></div>
-            <div id="help-page" class="page p-4 text-center justify-center items-center"><h2 class="text-xl font-bold" data-translate-key="help_title"></h2><p class="text-tg-hint" data-translate-key="help_desc"></p></div>
+            <div id="my-purchases-page" class="page p-4 overflow-y-auto"><h2 class="text-xl font-bold mb-4 flex-shrink-0" data-translate-key="my_purchases"></h2><div id="my-purchases-container" class="space-y-3"></div></div>
+            <div id="help-page" class="page p-4 text-center items-center justify-center"><h2 class="text-xl font-bold text-center mb-4" data-translate-key="help_title"></h2><p class="text-tg-hint text-center" data-translate-key="help_content"></p></div>
+            
             <div id="chat-page" class="page flex flex-col">
                 <header class="flex-shrink-0 p-4 bg-tg-secondary-bg flex items-center gap-4 border-b border-gray-700/50">
                     <img src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full">
@@ -79,7 +87,7 @@
                 <div class="flex-grow p-4 overflow-y-auto"><div class="text-center text-tg-hint text-sm" data-translate-key="chat_placeholder"></div></div>
                 <footer class="flex-shrink-0 p-2 bg-tg-secondary-bg flex items-center gap-2 border-t border-gray-700/50">
                     <input type="text" data-translate-key="message_placeholder" placeholder="Xabar yozing..." class="w-full bg-tg-bg rounded-full py-2 px-4 focus:outline-none">
-                    <button class="w-10 h-10 bg-tg-button rounded-full flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v6m0 0V4.5m0 6l3.59 3.59c.36.36.93.39 1.32.07.4-.32.4-.89.07-1.25L12 10.5z"></path></svg></button>
+                    <button class="w-10 h-10 bg-tg-button rounded-full flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-white"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg></button>
                 </footer>
             </div>
         </main>
@@ -105,24 +113,21 @@
         document.addEventListener('DOMContentLoaded', function () {
             const tg = window.Telegram.WebApp;
 
-            // ===== SUBPAGES RO'YXATI =====
-            const subPages = ['my-purchases-page', 'help-page', 'chat-page'];
-
             // ================== MA'LUMOTLAR BAZASI (DEMO) ==================
             const dummyAds = [
-                { id: 3673, title: 'PUBG Mythic Account', price: '80', images: ['https://via.placeholder.com/600x600/2ea6ff/17212b?text=PUBG+1', 'https://via.placeholder.com/600x600/2ea6ff/17212b?text=PUBG+2'], isAdmin: false, description: "Zo'r hisob!" },
+                { id: 3673, title: 'PUBG Mythic Account', price: '80', images: ['https://via.placeholder.com/600x600/2ea6ff/17212b?text=PUBG+1', 'https://via.placeholder.com/600x600/2ea6ff/17212b?text=PUBG+2'], isAdmin: false, description: 'Juda kuchli akkaunt.', category: 'PUBG' },
                 { id: 1550, title: 'Free Fire MAX', price: '7.6', images: ['https://via.placeholder.com/600x600/e91e63/17212b?text=FF+1'], isAdmin: true, description: 'Admin maxsus taklifi.', category: 'Free Fire' },
-                { id: 1551, title: 'CS:GO Prime', price: '15', images: ['https://via.placeholder.com/600x600/ff9800/17212b?text=CSGO+1', 'https://via.placeholder.com/600x600/ff9800/17212b?text=CSGO+2'], isAdmin: false, description: 'Prime bilan.', category: 'CSGO' },
-                { id: 1552, title: 'Mobile Legends Mythic', price: '50', images: ['https://via.placeholder.com/600x600/4caf50/17212b?text=MLBB+1'], isAdmin: true, description: "Ko'plab skinlar bor.", category: 'Mobile Legends' },
+                { id: 1551, title: 'CS:GO Prime', price: '15', images: ['https://via.placeholder.com/600x600/ff9800/17212b?text=CSGO+1', 'https://via.placeholder.com/600x600/ff9800/17212b?text=CSGO+2', 'https://via.placeholder.com/600x600/ff9800/17212b?text=CSGO+3'], isAdmin: false, description: 'Ranki baland.', category: 'CSGO' },
+                { id: 1552, title: 'Mobile Legends Mythic', price: '50', images: ['https://via.placeholder.com/600x600/4caf50/17212b?text=MLBB+1'], isAdmin: true, description: 'Ko\'plab skinlar bor.', category: 'Mobile Legends' },
             ];
             const samplePurchases = [ { id: "p1", title: "PUBG Glacier M416", login: "user123", password: "password123", info: "70 level, M416 glacier skin."} ];
             const categories = ['All', 'PUBG', 'Free Fire', 'Mobile Legends', 'CSGO'];
             
             const translations = {
-                 'uz': { home: 'Bosh sahifa', all_items: 'Barcha mahsulotlar', buy_stars_nav: 'Yulduzlar', buy_stars: 'Yulduz Sotib Olish', buy_stars_desc: 'Yulduzlar sotib olish sahifasi.', history: 'Tarix', history_desc: 'Sizning tranzaktsiyalaringiz.', profile: 'Profil', my_purchases: "Mening xaridlarim", help: "Yordam", support: "Qo'llab-quvvatlash", help_title: "Yordam", help_desc: "Tez-tez so'raladigan savollar.", language: "Til", select_language: "Tilni tanlang", login: "Login", password: "Parol", info: "Ma'lumot", chat_placeholder: "Hozircha xabarlar yo‘q", message_placeholder: "Xabar yozing..." },
-                 'ru': { home: 'Главная', all_items: 'Все товары', buy_stars_nav: 'Звезды', buy_stars: 'Купить Звезды', buy_stars_desc: 'Страница покупки звезд.', history: 'История', history_desc: 'Ваши транзакции.', profile: 'Профиль', my_purchases: "Мои покупки", help: "Помощь", support: "Поддержка", help_title: "Помощь", help_desc: "Часто задаваемые вопросы.", language: "Язык", select_language: "Выберите язык", login: "Логин", password: "Пароль", info: "Информация", chat_placeholder: "Пока сообщений нет", message_placeholder: "Напишите сообщение..." },
-                 'en': { home: 'Home', all_items: 'All Items', buy_stars_nav: 'Stars', buy_stars: 'Buy Stars', buy_stars_desc: 'Stars purchasing page.', history: 'History', history_desc: 'Your transactions.', profile: 'Profile', my_purchases: "My Purchases", help: "Help", support: "Support", help_title: "Help", help_desc: "Frequently asked questions.", language: "Language", select_language: "Select language", login: "Login", password: "Password", info: "Info", chat_placeholder: "No messages yet", message_placeholder: "Type a message..." },
-                 'ja': { home: 'ホーム', all_items: 'すべての商品', buy_stars_nav: 'スター', buy_stars: 'スターを購入', buy_stars_desc: 'スター購入ページ。', history: '履歴', history_desc: 'あなたの取引履歴。', profile: 'プロフィール', my_purchases: "購入履歴", help: "ヘルプ", support: "サポート", help_title: "ヘルプ", help_desc: "よくある質問。", language: "言語", select_language: "言語を選択", login: "ログイン", password: "パスワード", info: "情報", chat_placeholder: "まだメッセージはありません", message_placeholder: "メッセージを入力..." }
+                 'uz': { home: 'Bosh sahifa', all_items: 'Barcha mahsulotlar', buy_stars_nav: 'Yulduzlar', buy_stars: 'Yulduz Sotib Olish', history: 'Tarix', profile: 'Profil', my_purchases: "Mening xaridlarim", help: "Yordam", support: "Qo'llab-quvvatlash", language: "Tilni o'zgartirish", help_title: "Yordam Markazi", help_content: "Savollaringiz bo'lsa, yordam xizmatiga murojaat qiling.", support_chat: "Qo'llab-quvvatlash Chati", message_placeholder: "Xabar yozing...", coming_soon: "Bu bo'lim tez kunda ishga tushadi.", no_history: "Hozircha amallar mavjud emas.", login: "Login", password: "Parol", info: "Ma'lumot", chat_placeholder: 'Bu chat poydevori.', select_language: "Tilni tanlang" },
+                 'ru': { home: 'Главная', all_items: 'Все товары', buy_stars_nav: 'Звезды', buy_stars: 'Купить Звезды', history: 'История', profile: 'Профиль', my_purchases: "Мои покупки", help: "Помощь", support: "Поддержка", language: "Сменить язык", help_title: "Центр помощи", help_content: "Если у вас есть вопросы, обратитесь в службу поддержки.", support_chat: "Чат с поддержкой", message_placeholder: "Напишите сообщение...", coming_soon: "Этот раздел скоро будет доступен.", no_history: "Пока нет транзакций.", login: "Логин", password: "Пароль", info: "Информация", chat_placeholder: 'Это заглушка для чата.', select_language: "Выберите язык" },
+                 'en': { home: 'Home', all_items: 'All Items', buy_stars_nav: 'Stars', buy_stars: 'Buy Stars', history: 'History', profile: 'Profile', my_purchases: "My Purchases", help: "Help", support: "Support", language: "Change Language", help_title: "Help Center", help_content: "If you have any questions, please contact support.", support_chat: "Support Chat", message_placeholder: "Write a message...", coming_soon: "This section will be available soon.", no_history: "No transactions yet.", login: "Login", password: "Password", info: "Information", chat_placeholder: 'This is a chat placeholder.', select_language: "Select Language" },
+                 'ja': { home: 'ホーム', all_items: 'すべての商品', buy_stars_nav: 'スター', buy_stars: 'スターを購入', history: '履歴', profile: 'プロフィール', my_purchases: "私の購入", help: "ヘルプ", support: "サポート", language: "言語を変更", help_title: "ヘルプセンター", help_content: "ご不明な点がございましたら、サポートにお問い合わせください。", support_chat: "サポートチャット", message_placeholder: "メッセージを書いてください...", coming_soon: "このセクションは間もなく利用可能になります。", no_history: "まだ取引はありません。", login: "ログイン", password: "パスワード", info: "情報", chat_placeholder: 'これはチャットのプレースホルダーです。', select_language: "言語を選択" }
             };
             let currentLanguage = 'uz';
             let navigationHistory = ['home-page'];
@@ -132,12 +137,16 @@
             // ==========================================================
             
             function navigateTo(pageId) {
-                if (navigationHistory[navigationHistory.length - 1] === pageId) return;
-                if (!subPages.includes(pageId)) {
+                if(navigationHistory[navigationHistory.length - 1] === pageId) return;
+
+                const isSubPage = ['my-purchases-page', 'help-page', 'chat-page'].includes(pageId);
+                
+                if (!isSubPage) {
                     navigationHistory = [pageId];
                 } else {
                     navigationHistory.push(pageId);
                 }
+                
                 updatePageVisibility();
             }
 
@@ -153,17 +162,13 @@
                 
                 document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
                 const pageElement = document.getElementById(currentPageId);
-                if (pageElement) {
-                    pageElement.classList.add('active');
-                    pageElement.scrollTop = 0;
-                }
+                if (pageElement) pageElement.classList.add('active');
 
                 document.querySelectorAll('.nav-item').forEach(nav => {
                     nav.classList.toggle('active', nav.dataset.page === navigationHistory[0]);
                 });
-
-                // MUHIM: subPages orqali aniqlash
-                const isSubPage = subPages.includes(currentPageId);
+                
+                const isSubPage = navigationHistory.length > 1;
                 document.getElementById('bottom-nav').style.display = isSubPage ? 'none' : 'flex';
 
                 if (isSubPage) { tg.BackButton.show(); } 
@@ -288,8 +293,8 @@
                     const key = el.getAttribute('data-translate-key');
                     const translation = translations[currentLanguage]?.[key];
                     if (translation) {
-                        if (el.placeholder) el.placeholder = translation;
-                        else el.textContent = translation;
+                         if (el.placeholder) el.placeholder = translation;
+                         else el.textContent = translation;
                     }
                 });
                 document.querySelectorAll('.lang-btn').forEach(btn => {
@@ -316,10 +321,10 @@
             new Swiper('#home-page .swiper', { loop: true, autoplay: { delay: 3000 } });
 
             const navItems = [
-                { id: 'home-page', key: 'home', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 17.25v-5.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V12c0 .621.504 1.125 1.125 1.125h2.25c.621 0 1.125-.504 1.125-1.125v-.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V17.25"></path></svg>' },
-                { id: 'buy-stars-page', key: 'buy_stars_nav', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 17.25l-6.16 3.24 1.18-6.88-5-4.87 6.91-1 .09-.09L12 2.25l3.09 6.5.09.09 6.91 1-5 4.87 1.18 6.88z"></path></svg>' },
-                { id: 'history-page', key: 'history', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5v5.25l3.5 2.1"></path></svg>' },
-                { id: 'profile-page', key: 'profile', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 7.5A3.75 3.75 0 1112 3.75 3.75 3.75 0 0115.75 7.5zm-7.5 0A3.75 3.75 0 1112 3.75 3.75 3.75 0 018.25 7.5zM21 21v-2.25A3.75 3.75 0 0017.25 15h-10.5A3.75 3.75 0 003 18.75V21"></path></svg>' },
+                { id: 'home-page', key: 'home', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>' },
+                { id: 'buy-stars-page', key: 'buy_stars_nav', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>' },
+                { id: 'history-page', key: 'history', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>' },
+                { id: 'profile-page', key: 'profile', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>' }
             ];
             const navContainer = document.getElementById('bottom-nav');
             navItems.forEach(item => {
