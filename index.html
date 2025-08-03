@@ -32,7 +32,7 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         body { overflow: hidden; }
-        /* main { padding-bottom: 70px; } <-- XATOLIK SABABCHISI BO'LGAN QATOR O'CHIRILDI */
+        /* main { padding-bottom: 70px; } <-- Xatolik keltirib chiqargan ushbu qator olib tashlandi */
         .page { display: none; }
         .page.active { display: block; }
 
@@ -323,10 +323,10 @@
                 navContainer.appendChild(navElement);
             });
 
-            document.getElementById('my-purchases-btn').addEventListener('click', () => navigateTo('my-purchases-page'));
-            document.getElementById('help-btn').addEventListener('click', () => navigateTo('help-page'));
-            document.getElementById('support-btn').addEventListener('click', () => navigateTo('chat-page'));
-            // TUGMA ISHLASHI UCHUN QO'SHILGAN QATOR
+            document.getElementById('my-purchases-btn').addEventListener('click', () => navigateTo('my-purchases-page', true));
+            document.getElementById('help-btn').addEventListener('click', () => navigateTo('help-page', true));
+            document.getElementById('support-btn').addEventListener('click', () => navigateTo('chat-page', true));
+            // TILNI O'ZGARTIRISH TUGMASI UCHUN ISHLAYDIGAN QILIB QO'SHILDI
             document.getElementById('language-btn').addEventListener('click', openLanguageModal);
 
             const categoryContainer = document.getElementById('category-container');
