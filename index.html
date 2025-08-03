@@ -6,8 +6,6 @@
     <title>Game Market</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         tailwind.config = {
@@ -30,14 +28,14 @@
             from { opacity: 0; transform: translateY(1rem); } 
             to { opacity: 1; transform: translateY(0); } 
         }
+        
         .nav-item.active {
             color: var(--tg-theme-link-color, #62bcf9) !important;
         }
-        .nav-item.active svg {
-            color: var(--tg-theme-link-color, #62bcf9) !important;
-        }
+        
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
         .loading {
             display: inline-block;
             width: 20px;
@@ -47,239 +45,192 @@
             border-top-color: #fff;
             animation: spin 1s ease-in-out infinite;
         }
+        
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        /* Ensure bottom navigation is always visible */
-        #bottom-nav {
-            position: fixed !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            z-index: 1000 !important;
-            background: var(--tg-theme-secondary-bg-color, #222e3a) !important;
-            backdrop-filter: blur(10px) !important;
-            border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-            height: 64px !important;
+        /* Simple layout */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* Adjust main content to account for fixed bottom nav */
-        main {
-            padding-bottom: 80px !important;
-            height: calc(100vh - 64px) !important;
-            overflow-y: auto !important;
-        }
-
-        /* Ensure proper spacing for pages */
-        .page {
-            min-height: calc(100vh - 80px);
-            padding-bottom: 20px;
-        }
-
-        /* Fix app container - OVERFLOW HIDDEN OLIB TASHLANDI */
         #app {
-            height: 100vh !important;
-            display: flex !important;
-            flex-direction: column !important;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+
+        #bottom-nav {
+            height: 64px;
+            flex-shrink: 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
         }
     </style>
 </head>
 <body class="bg-tg-bg text-tg-text font-sans antialiased">
 
-    <div id="app" class="h-screen w-screen flex flex-col">
-        <main class="flex-grow overflow-y-auto">
+    <div id="app">
+        <main>
             <!-- Home Page -->
-            <div id="home-page" class="page">
-                <div class="swiper h-48">
-                    <div class="swiper-wrapper" id="banner-container">
-                        <!-- Banners will be loaded here -->
-                    </div>
+            <div id="home-page" class="page active">
+                <!-- Banner Section -->
+                <div class="h-48 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                    <h1 class="text-2xl font-bold text-white">Game Market</h1>
                 </div>
+                
+                <!-- Categories -->
                 <div class="px-4 py-3">
                     <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2" id="category-filters">
-                        <!-- Categories will be loaded here -->
+                        <button onclick="filterItems('all')" class="category-btn active bg-tg-button text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">All</button>
+                        <button onclick="filterItems('PUBG')" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">PUBG</button>
+                        <button onclick="filterItems('Free Fire')" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Free Fire</button>
+                        <button onclick="filterItems('Call of Duty')" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Call of Duty</button>
                     </div>
                 </div>
+                
+                <!-- Items Grid -->
                 <div class="flex justify-between items-center px-4 pt-1 pb-3">
-                    <h2 class="text-2xl font-bold tracking-tight">Alll Items</h2>
+                    <h2 class="text-2xl font-bold tracking-tight">All Items</h2>
                     <div id="loading-indicator" class="loading hidden"></div>
                 </div>
-                <div id="card-container" class="px-4 pb-4 grid grid-cols-2 gap-4">
+                <div id="items-container" class="px-4 pb-4 grid grid-cols-2 gap-4">
                     <!-- Items will be loaded here -->
                 </div>
             </div>
 
             <!-- Buy Stars Page -->
-            <div id="buy-stars-page" class="page hidden p-4">
+            <div id="buy-stars-page" class="page p-4">
                 <h2 class="text-xl font-bold text-center mb-6">Buy Stars</h2>
                 <div id="star-packages" class="space-y-4">
-                    <!-- Star packages will be loaded here -->
+                    <div class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold">100 Stars</h3>
+                            <p class="text-tg-hint text-sm">Starter pack</p>
+                        </div>
+                        <button class="bg-tg-button text-white px-4 py-2 rounded-lg">$0.99</button>
+                    </div>
+                    <div class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold">500 Stars</h3>
+                            <p class="text-tg-hint text-sm">Popular pack</p>
+                        </div>
+                        <button class="bg-tg-button text-white px-4 py-2 rounded-lg">$4.99</button>
+                    </div>
+                    <div class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold">1000 Stars</h3>
+                            <p class="text-tg-hint text-sm">Best value</p>
+                        </div>
+                        <button class="bg-tg-button text-white px-4 py-2 rounded-lg">$9.99</button>
+                    </div>
                 </div>
             </div>
             
             <!-- History Page -->
-            <div id="history-page" class="page hidden p-4">
+            <div id="history-page" class="page p-4">
                 <h2 class="text-xl font-bold mb-4">Purchase History</h2>
-                <div id="history-container">
-                    <!-- Purchase history will be loaded here -->
+                <div class="space-y-3">
+                    <div class="bg-tg-secondary-bg p-4 rounded-xl">
+                        <p class="font-semibold">PUBG Conqueror Account</p>
+                        <p class="text-tg-hint text-sm">150 Stars • Completed</p>
+                        <p class="text-tg-hint text-xs">2024-01-15</p>
+                    </div>
                 </div>
             </div>
 
             <!-- Profile Page -->
-            <div id="profile-page" class="page hidden">
-                <div id="profile-main">
-                    <div class="flex flex-col items-center p-6">
-                        <img id="profile-photo" class="w-24 h-24 rounded-full border-2 border-tg-link">
-                        <h2 id="profile-name" class="text-2xl font-bold mt-4"></h2>
-                        <p id="profile-role" class="text-tg-hint mt-1"></p>
-                        <div class="flex items-center gap-2 mt-2">
-                            <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8 0L0 4.66667V14L8 9.33333L16 14V4.66667L8 0Z" fill="currentColor"/>
-                            </svg>
-                            <span id="user-balance" class="font-bold">0</span>
-                        </div>
-                    </div>
-                    <div class="px-4 flex flex-col gap-3">
-                        <div onclick="navigateTo({type: 'page', id: 'my-purchases-page'})" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]">
-                            <div class="flex items-center gap-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c.51 0 .962-.328 1.093-.826l1.821-6.831c.13-.483-.145-.996-.644-1.17a48.11 48.11 0 00-1.821-.545A48.11 48.11 0 007.5 4.5M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
-                                </svg>
-                                <span class="font-medium">My Purchases</span>
-                            </div>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                            </svg>
-                        </div>
-                        
-                        <!-- Admin Panel Button (only for admins) -->
-                        <div id="admin-panel-btn" class="hidden bg-red-900/40 p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]" onclick="navigateTo({type: 'page', id: 'admin-page'})">
-                            <div class="flex items-center gap-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-red-400">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                <span class="font-medium">Admin Panel</span>
-                            </div>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                            </svg>
-                        </div>
-
-                        <div onclick="navigateTo({type: 'subpage', id: 'help-subpage'})" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]">
-                            <div class="flex items-center gap-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-                                </svg>
-                                <span class="font-medium">Help</span>
-                            </div>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                            </svg>
-                        </div>
-                        <div onclick="navigateTo({type: 'page', id: 'chat-page'})" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]">
-                            <div class="flex items-center gap-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.325 3.218.086 6.533-.533 9.491-2.311A2.25 2.25 0 0021 18.75V7.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 7.5v1.51z" />
-                                </svg>
-                                <span class="font-medium">Support</span>
-                            </div>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-                <div id="help-subpage" class="hidden p-4">
-                     <h2 class="text-xl font-bold text-center mb-4">About App</h2>
-                     <p class="text-tg-hint text-center">This app is a platform for buying and selling game accounts.</p>
-                </div>
-            </div>
-
-            <!-- My Purchases Page -->
-            <div id="my-purchases-page" class="page hidden p-4">
-                <h2 class="text-xl font-bold mb-4">My Purchases</h2>
-                <div id="purchases-container">
-                    <!-- Purchases will be loaded here -->
-                </div>
-            </div>
-            
-            <!-- Chat Page -->
-            <div id="chat-page" class="page hidden flex flex-col h-full">
-                <header class="flex-shrink-0 p-4 bg-tg-secondary-bg flex items-center gap-4 border-b border-gray-700/50">
-                    <img src="/placeholder.svg?height=40&width=40" class="w-10 h-10 rounded-full">
-                    <div>
-                        <h3 class="font-bold">Support</h3>
-                        <p class="text-sm text-tg-hint">online</p>
-                    </div>
-                </header>
-                <div id="chat-messages" class="flex-grow p-4 overflow-y-auto">
-                    <!-- Messages will be loaded here -->
-                </div>
-                <footer class="flex-shrink-0 p-2 bg-tg-secondary-bg flex items-center gap-2 border-t border-gray-700/50">
-                    <input type="text" id="message-input" placeholder="Write a message..." class="w-full bg-tg-bg rounded-full py-2 px-4 focus:outline-none">
-                    <button id="send-message-btn" class="w-10 h-10 bg-tg-button rounded-full flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-white">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+            <div id="profile-page" class="page">
+                <div class="flex flex-col items-center p-6">
+                    <img id="profile-photo" class="w-24 h-24 rounded-full border-2 border-tg-link" src="/placeholder.svg?height=96&width=96">
+                    <h2 id="profile-name" class="text-2xl font-bold mt-4">User Name</h2>
+                    <p id="profile-role" class="text-tg-hint mt-1">USER</p>
+                    <div class="flex items-center gap-2 mt-2">
+                        <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 0L0 4.66667V14L8 9.33333L16 14V4.66667L8 0Z" fill="currentColor"/>
                         </svg>
-                    </button>
-                </footer>
-            </div>
-
-            <!-- Admin Page -->
-            <div id="admin-page" class="page hidden p-4">
-                <h2 class="text-xl font-bold mb-4">Admin Panel</h2>
-                <div class="space-y-4">
-                    <!-- User Management -->
-                    <div class="bg-tg-secondary-bg p-4 rounded-xl">
-                        <h3 class="font-bold mb-3">User Management</h3>
-                        <div class="space-y-2">
-                            <button onclick="showUserManagement()" class="w-full bg-tg-button text-white py-2 px-4 rounded-lg">Manage Users</button>
-                            <button onclick="showRoleAssignment()" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg">Assign Roles</button>
+                        <span id="user-balance" class="font-bold">0</span>
+                    </div>
+                </div>
+                <div class="px-4 flex flex-col gap-3">
+                    <div class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center gap-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c.51 0 .962-.328 1.093-.826l1.821-6.831c.13-.483-.145-.996-.644-1.17a48.11 48.11 0 00-1.821-.545A48.11 48.11 0 007.5 4.5M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                            </svg>
+                            <span class="font-medium">My Purchases</span>
                         </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
                     </div>
                     
-                    <!-- Item Management -->
-                    <div class="bg-tg-secondary-bg p-4 rounded-xl">
-                        <h3 class="font-bold mb-3">Item Management</h3>
-                        <div class="space-y-2">
-                            <button onclick="showAddItem()" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg">Add New Item</button>
-                            <button onclick="showManageItems()" class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg">Manage Items</button>
+                    <div class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer">
+                        <div class="flex items-center gap-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.325 3.218.086 6.533-.533 9.491-2.311A2.25 2.25 0 0021 18.75V7.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 7.5v1.51z" />
+                            </svg>
+                            <span class="font-medium">Support</span>
                         </div>
-                    </div>
-                    
-                    <!-- Statistics -->
-                    <div class="bg-tg-secondary-bg p-4 rounded-xl">
-                        <h3 class="font-bold mb-3">Statistics</h3>
-                        <div id="admin-stats" class="grid grid-cols-2 gap-4">
-                            <!-- Stats will be loaded here -->
-                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
                     </div>
                 </div>
             </div>
         </main>
         
-        <footer id="bottom-nav" class="flex-shrink-0 h-16 bg-tg-secondary-bg/80 backdrop-blur-xl border-t border-gray-700/50 flex justify-around items-center">
-    <!-- Navigation items will be inserted here by JavaScript -->
-</footer>
-    </div>
-    
-    <!-- Item Modal -->
-    <div id="item-modal" class="fixed inset-0 bg-tg-bg z-50 hidden flex-col transition-opacity duration-300 opacity-0"></div>
-
-    <!-- Purchase Modal -->
-    <div id="purchase-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-tg-bg rounded-xl p-6 w-full max-w-sm">
-            <h3 class="text-lg font-bold mb-4">Confirm Purchase</h3>
-            <div id="purchase-details" class="mb-4">
-                <!-- Purchase details will be shown here -->
+        <!-- Bottom Navigation -->
+        <nav id="bottom-nav" class="bg-tg-secondary-bg/90 backdrop-blur-xl border-t border-gray-700/50 flex justify-around items-center">
+            <div onclick="showPage('home-page')" class="nav-item active flex-1 flex flex-col items-center justify-center cursor-pointer py-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                </svg>
+                <span class="text-xs font-medium">Home</span>
             </div>
-            <div class="flex gap-3">
-                <button onclick="closePurchaseModal()" class="flex-1 bg-gray-600 text-white py-2 rounded-lg">Cancel</button>
-                <button onclick="confirmPurchase()" class="flex-1 bg-tg-button text-white py-2 rounded-lg">Confirm</button>
+            
+            <div onclick="showPage('buy-stars-page')" class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint py-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                </svg>
+                <span class="text-xs font-medium">Buy Stars</span>
             </div>
-        </div>
+            
+            <div onclick="showPage('history-page')" class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint py-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                </svg>
+                <span class="text-xs font-medium">History</span>
+            </div>
+            
+            <div onclick="showPage('profile-page')" class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint py-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+                <span class="text-xs font-medium">Profile</span>
+            </div>
+        </nav>
     </div>
 
     <script src="app.js"></script>
