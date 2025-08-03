@@ -4,6 +4,7 @@ const API_BASE_URL = "http://localhost:8000/api"
 const navigationStack = []
 let currentUser = null
 let currentItems = []
+let filteredItems = []
 let currentCategories = []
 const Swiper = window.Swiper // Declare Swiper variable
 
@@ -308,6 +309,7 @@ async function loadItems(category = null) {
     const endpoint = category ? `/items?category=${category}` : "/items"
     const items = await apiCall(endpoint)
     currentItems = items
+    filteredItems = items
     renderItems(items)
   } catch (error) {
     console.error("Error loading items:", error)
@@ -332,7 +334,7 @@ function renderCategories(categories) {
   container.querySelectorAll(".category-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const category = e.target.getAttribute("data-category")
-      filterByCategory(category === "all" ? null : category)
+      filterItems(category === "all" ? null : category)
     })
   })
 }
@@ -375,17 +377,17 @@ async function loadMyPurchases() {
 
 // Render Functions
 function renderItems(items) {
-  const container = document.getElementById("card-container")
+  const container = document.getElementById("items-container")
   if (!container) return
 
   container.innerHTML = items
     .map(
       (item, index) => `
-        <div onclick="openModal('${item._id}')" class="flex flex-col rounded-2xl ${item.is_admin_item ? "bg-blue-900/40" : "bg-tg-secondary-bg"} overflow-hidden transition-transform active:scale-95 cursor-pointer opacity-0" style="animation: fade-in 0.5s ease forwards ${index * 0.1}s;">
-            <img class="w-full h-auto aspect-square object-cover" src="${item.image_url || "/placeholder.svg?height=200&width=200"}" alt="${item.title}">
+        <div onclick="openItemModal('${item.id}')" class="flex flex-col rounded-2xl ${item.isAdmin ? "bg-blue-900/40" : "bg-tg-secondary-bg"} overflow-hidden transition-transform active:scale-95 cursor-pointer opacity-0" style="animation: fade-in 0.5s ease forwards ${index * 0.1}s;">
+            <img class="w-full h-auto aspect-square object-cover" src="${item.image || "/placeholder.svg?height=200&width=200"}" alt="${item.title}">
             <div class="p-3">
                 <p class="font-semibold truncate">${item.title}</p>
-                <p class="text-xs text-tg-hint">#${item.item_id}</p>
+                <p class="text-xs text-tg-hint">#${item.id}</p>
                 <div class="flex justify-between items-center mt-3">
                     <div class="flex items-center gap-1.5 bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-bold py-2 px-3 rounded-lg">
                         <svg class="w-4 h-4" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -407,100 +409,104 @@ function renderItems(items) {
 }
 
 // Filter Functions
-function filterByCategory(categoryName) {
-  console.log("Filtering by category:", categoryName)
+function filterItems(category) {
+  console.log("Filtering by category:", category)
 
   // Update button styles
   document.querySelectorAll(".category-btn").forEach((btn) => {
-    btn.classList.remove("bg-tg-button", "text-white")
+    btn.classList.remove("bg-tg-button", "text-white", "active")
     btn.classList.add("bg-tg-secondary-bg", "text-tg-text")
   })
 
-  // Find and highlight the active button
-  const activeButton = categoryName
-    ? document.querySelector(`[data-category="${categoryName}"]`)
-    : document.querySelector(`[data-category="all"]`)
-
-  if (activeButton) {
-    activeButton.classList.remove("bg-tg-secondary-bg", "text-tg-text")
-    activeButton.classList.add("bg-tg-button", "text-white")
-  }
+  // Activate clicked button
+  event.target.classList.remove("bg-tg-secondary-bg", "text-tg-text")
+  event.target.classList.add("bg-tg-button", "text-white", "active")
 
   // Filter items
-  let filteredItems = currentItems
-  if (categoryName) {
-    filteredItems = currentItems.filter((item) => item.category && item.category.name === categoryName)
+  if (category === "all") {
+    filteredItems = currentItems
+  } else {
+    filteredItems = currentItems.filter((item) => item.category === category)
   }
 
   renderItems(filteredItems)
 }
 
 // Item Functions
-function openModal(itemId) {
-  const item = currentItems.find((i) => i._id === itemId)
+function openItemModal(itemId) {
+  const item = currentItems.find((i) => i.id === itemId)
   if (!item) return
 
-  const modal = document.getElementById("item-modal")
-  if (!modal) return
+  console.log("Opening modal for item:", item.title)
 
-  modal.innerHTML = `
-    <div class="h-full w-full flex flex-col">
-        <div class="flex-grow overflow-y-auto">
-            <img src="${item.image_url}" class="w-full aspect-square object-cover" alt="${item.title}">
-            <div class="p-4">
-                <h2 class="text-3xl font-bold mb-2">${item.title}</h2>
-                <p class="text-lg text-tg-hint mb-4">#${item.item_id}</p>
-                <p class="text-base leading-relaxed mb-4">${item.description}</p>
-                <div class="bg-tg-secondary-bg p-3 rounded-lg">
-                    <p class="text-sm text-tg-hint mb-1">Category</p>
-                    <p class="font-medium">${item.category?.name || "General"}</p>
+  // Create modal HTML
+  const modalHTML = `
+        <div class="fixed inset-0 bg-black/50 z-50 flex items-end justify-center p-4" onclick="closeModal(event)">
+            <div class="bg-tg-bg rounded-t-3xl w-full max-w-md max-h-[80vh] overflow-hidden" onclick="event.stopPropagation()">
+                <div class="p-4 border-b border-gray-700/50">
+                    <div class="flex justify-between items-center">
+                        <h3 class="text-lg font-bold">Item Details</h3>
+                        <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-700/50">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-y-auto max-h-96">
+                    <img src="${item.image}" class="w-full aspect-square object-cover" alt="${item.title}">
+                    <div class="p-4">
+                        <h2 class="text-xl font-bold mb-2">${item.title}</h2>
+                        <p class="text-tg-hint mb-2">#${item.id}</p>
+                        <p class="text-sm leading-relaxed mb-4">${item.description}</p>
+                        <div class="bg-tg-secondary-bg p-3 rounded-lg mb-4">
+                            <p class="text-sm text-tg-hint mb-1">Category</p>
+                            <p class="font-medium">${item.category}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 border-t border-gray-700/50">
+                    <button onclick="purchaseItem('${item.id}')" class="w-full bg-tg-button text-white font-bold py-3 rounded-xl">
+                        Buy for ${item.price} Stars
+                    </button>
                 </div>
             </div>
         </div>
-        <footer class="flex-shrink-0 p-4 border-t border-gray-700/50 bg-tg-bg">
-            ${
-              item.is_admin_item
-                ? `<button onclick="showPurchaseModal('${item._id}', 'admin')" class="w-full bg-tg-button text-white font-bold py-4 rounded-xl">Buy via Admin (${item.price} Stars)</button>`
-                : `<div class="flex gap-3">
-                    <button onclick="showPurchaseModal('${item._id}', 'direct')" class="flex-1 bg-white/10 text-tg-text font-bold py-4 rounded-xl">Direct Purchase</button>
-                    <button onclick="showPurchaseModal('${item._id}', 'admin')" class="flex-1 bg-tg-button text-white font-bold py-4 rounded-xl">Via Admin</button>
-                </div>`
-            }
-        </footer>
-    </div>`
-  navigateTo({ type: "modal", id: "item-modal" })
+    `
+
+  // Add modal to body
+  const modalDiv = document.createElement("div")
+  modalDiv.id = "item-modal"
+  modalDiv.innerHTML = modalHTML
+  document.body.appendChild(modalDiv)
 }
 
-function showPurchaseModal(itemId, type) {
-  const item = currentItems.find((i) => i._id === itemId)
-  if (!item) return
+function closeModal(event) {
+  if (event && event.target !== event.currentTarget) return
 
-  const modal = document.getElementById("purchase-modal")
-  const details = document.getElementById("purchase-details")
-
-  if (!modal || !details) return
-
-  details.innerHTML = `
-    <div class="text-center">
-        <h4 class="font-bold mb-2">${item.title}</h4>
-        <p class="text-2xl font-bold text-tg-link mb-2">${item.price} Stars</p>
-        <p class="text-sm text-tg-hint">Purchase Type: ${type === "admin" ? "Via Admin" : "Direct"}</p>
-    </div>
-  `
-
-  modal.classList.remove("hidden")
-  modal.dataset.itemId = itemId
-  modal.dataset.purchaseType = type
-}
-
-function closePurchaseModal() {
-  const modal = document.getElementById("purchase-modal")
+  const modal = document.getElementById("item-modal")
   if (modal) {
-    modal.classList.add("hidden")
+    modal.remove()
   }
 }
 
-// Utility Functions
+function purchaseItem(itemId) {
+  const item = currentItems.find((i) => i.id === itemId)
+  if (!item) return
+
+  console.log("Purchasing item:", item.title)
+
+  // Show success message
+  if (tg && tg.showAlert) {
+    tg.showAlert(`Successfully purchased ${item.title} for ${item.price} stars!`)
+  } else {
+    alert(`Successfully purchased ${item.title} for ${item.price} stars!`)
+  }
+
+  closeModal()
+}
+
+// Profile functions
 function updateProfileUI(user) {
   const profilePhoto = document.getElementById("profile-photo")
   const profileName = document.getElementById("profile-name")
@@ -524,6 +530,7 @@ function updateProfileUI(user) {
   }
 }
 
+// Utility Functions
 function showLoading(show) {
   const indicator = document.getElementById("loading-indicator")
   if (indicator) {
@@ -572,64 +579,49 @@ function loadSampleData() {
   // Sample items
   const sampleItems = [
     {
-      _id: "1001",
-      item_id: "1001",
+      id: "1001",
       title: "PUBG Conqueror Account",
       description: "High-tier PUBG Mobile account with Conqueror rank, rare skins, and premium items.",
       price: 150,
-      image_url: "https://via.placeholder.com/300x300/2ea6ff/ffffff?text=PUBG+Conqueror",
-      is_admin_item: true,
-      category: { name: "PUBG" },
+      image: "https://via.placeholder.com/300x300/2ea6ff/ffffff?text=PUBG+Conqueror",
+      category: "PUBG",
+      isAdmin: true,
     },
     {
-      _id: "1002",
-      item_id: "1002",
+      id: "1002",
       title: "Free Fire Diamond Account",
       description: "Free Fire account with 50,000+ diamonds and exclusive characters.",
       price: 80,
-      image_url: "https://via.placeholder.com/300x300/e91e63/ffffff?text=Free+Fire+Diamond",
-      is_admin_item: false,
-      category: { name: "Free Fire" },
+      image: "https://via.placeholder.com/300x300/e91e63/ffffff?text=Free+Fire+Diamond",
+      category: "Free Fire",
+      isAdmin: false,
     },
     {
-      _id: "1003",
-      item_id: "1003",
+      id: "1003",
       title: "PUBG UC Account",
       description: "PUBG Mobile account with 8100 UC and premium battle pass.",
       price: 120,
-      image_url: "https://via.placeholder.com/300x300/4caf50/ffffff?text=PUBG+UC",
-      is_admin_item: true,
-      category: { name: "PUBG" },
+      image: "https://via.placeholder.com/300x300/4caf50/ffffff?text=PUBG+UC",
+      category: "PUBG",
+      isAdmin: true,
     },
     {
-      _id: "1004",
-      item_id: "1004",
+      id: "1004",
       title: "Free Fire Elite Pass",
       description: "Free Fire account with Elite Pass and rare bundles.",
       price: 45,
-      image_url: "https://via.placeholder.com/300x300/ff9800/ffffff?text=FF+Elite",
-      is_admin_item: false,
-      category: { name: "Free Fire" },
+      image: "https://via.placeholder.com/300x300/ff9800/ffffff?text=FF+Elite",
+      category: "Free Fire",
+      isAdmin: false,
     },
     {
-      _id: "1005",
-      item_id: "1005",
+      id: "1005",
       title: "Call of Duty Legendary",
       description: "COD Mobile account with legendary weapons and skins.",
       price: 200,
-      image_url: "https://via.placeholder.com/300x300/9c27b0/ffffff?text=COD+Legendary",
-      is_admin_item: true,
-      category: { name: "Call of Duty" },
-    },
-    {
-      _id: "1006",
-      item_id: "1006",
-      title: "Clash of Clans Max",
-      description: "Maxed out Clash of Clans account with all troops and buildings.",
-      price: 300,
-      image_url: "https://via.placeholder.com/300x300/f44336/ffffff?text=COC+Max",
-      is_admin_item: false,
-      category: { name: "Clash of Clans" },
+      image: "https://via.placeholder.com/300x300/9c27b0/ffffff?text=COD+Legendary",
+      category: "Call of Duty",
+      isAdmin: true,
     },
   ]
 
@@ -671,6 +663,7 @@ function loadSampleData() {
 
   // Set global variables
   currentItems = sampleItems
+  filteredItems = sampleItems
   currentCategories = sampleCategories
 
   // Render data
@@ -711,7 +704,7 @@ async function buyStars(packageId) {
 
 function confirmPurchase() {
   console.log("Confirming purchase")
-  closePurchaseModal()
+  closeModal()
 }
 
 // Admin functions
@@ -787,3 +780,5 @@ function updateUI(view) {
     tg.BackButton.hide()
   }
 }
+
+console.log("App.js loaded successfully!")
