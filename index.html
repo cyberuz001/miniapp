@@ -6,9 +6,9 @@
     <title>Game Market</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -30,427 +30,349 @@
             from { opacity: 0; transform: translateY(1rem); } 
             to { opacity: 1; transform: translateY(0); } 
         }
-        
         .nav-item.active {
-            color: var(--tg-theme-link-color, #62bcf9) !important;
+            color: var(--tg-theme-link-color, #62bcf9);
         }
-        
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
+        /* Chat messages styles */
+        .message {
+            max-width: 80%;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            border-radius: 18px;
+            word-wrap: break-word;
         }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .message.sent {
+            background-color: var(--tg-theme-button-color, #5288c1);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
         }
-
-        /* Simple layout */
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            overflow: hidden;
+        .message.received {
+            background-color: var(--tg-theme-secondary-bg-color, #222e3a);
+            color: var(--tg-theme-text-color, #ffffff);
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
         }
-
-        #app {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        main {
-            flex: 1;
-            overflow-y: auto;
-            padding-bottom: 80px;
-        }
-
-        #bottom-nav {
-            height: 64px;
-            flex-shrink: 0;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-        }
-
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
+        .message img {
+            max-width: 200px;
+            border-radius: 8px;
+            margin-top: 4px;
         }
     </style>
 </head>
-<body class="bg-tg-bg text-tg-text font-sans antialiased">
+<body class="bg-tg-bg text-tg-text font-sans antialiased overflow-hidden">
 
-    <div id="app">
-        <main>
-            <!-- Home Page -->
-            <div id="home-page" class="page active">
-                <!-- Banner Section -->
+    <div id="app" class="h-screen w-screen flex flex-col">
+        <main class="flex-grow overflow-y-auto">
+            <div id="home-page" class="page">
                 <div class="swiper h-48">
-                    <div class="swiper-wrapper" id="banner-container">
-                        <div class="swiper-slide">
-                            <img src="https://via.placeholder.com/600x360/2ea6ff/ffffff?text=Top+Games+Sale" class="w-full h-full object-cover rounded-lg" alt="Top Games Sale">
-                        </div>
-                        <div class="swiper-slide">
-                            <img src="https://via.placeholder.com/600x360/e91e63/ffffff?text=Special+Offer" class="w-full h-full object-cover rounded-lg" alt="Special Offer">
-                        </div>
-                        <div class="swiper-slide">
-                            <img src="https://via.placeholder.com/600x360/4caf50/ffffff?text=New+Arrivals" class="w-full h-full object-cover rounded-lg" alt="New Arrivals">
-                        </div>
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide"><img src="https://via.placeholder.com/600x360/2ea6ff/ffffff?text=Top+O'yinlar" class="w-full h-full object-cover"></div>
+                        <div class="swiper-slide"><img src="https://via.placeholder.com/600x360/333333/ffffff?text=Aksiya" class="w-full h-full object-cover"></div>
                     </div>
-                    <div class="swiper-pagination"></div>
                 </div>
-                
-                <!-- Categories -->
                 <div class="px-4 py-3">
-                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2" id="category-filters">
-                        <button data-category="all" class="category-btn active bg-tg-button text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">All</button>
-                        <button data-category="PUBG" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">PUBG</button>
-                        <button data-category="Free Fire" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Free Fire</button>
-                        <button data-category="Mobile Legend" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Mobile Legend</button>
-                        <button data-category="CSGO" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">CSGO</button>
+                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                        <button class="bg-tg-button text-tg-button-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">All</button>
+                        <button class="bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">PUBG</button>
+                        <button class="bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Free Fire</button>
                     </div>
                 </div>
-                
-                <!-- Items Grid -->
-                <div class="flex justify-between items-center px-4 pt-1 pb-3">
-                    <h2 class="text-2xl font-bold tracking-tight">All Items</h2>
-                    <div id="loading-indicator" class="loading hidden"></div>
-                </div>
-                <div id="items-container" class="px-4 pb-4 grid grid-cols-2 gap-4">
-                    <!-- Items will be loaded here -->
-                </div>
+                <div class="flex justify-between items-center px-4 pt-1 pb-3"><h2 class="text-2xl font-bold tracking-tight">All Items</h2></div>
+                <div id="card-container" class="px-4 pb-4 grid grid-cols-2 gap-4"></div>
             </div>
 
-            <!-- Buy Stars Page -->
-            <div id="buy-stars-page" class="page p-4">
-                <h2 class="text-xl font-bold text-center mb-6">Buy Stars</h2>
-                <div id="star-packages" class="space-y-4">
-                    <div class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center">
-                        <div>
-                            <h3 class="font-bold">100 Stars</h3>
-                            <p class="text-tg-hint text-sm">Starter pack</p>
-                        </div>
-                        <button class="bg-tg-button text-white px-4 py-2 rounded-lg">$0.99</button>
-                    </div>
-                    <div class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center">
-                        <div>
-                            <h3 class="font-bold">500 Stars</h3>
-                            <p class="text-tg-hint text-sm">Popular pack</p>
-                        </div>
-                        <button class="bg-tg-button text-white px-4 py-2 rounded-lg">$4.99</button>
-                    </div>
-                    <div class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center">
-                        <div>
-                            <h3 class="font-bold">1000 Stars</h3>
-                            <p class="text-tg-hint text-sm">Best value</p>
-                        </div>
-                        <button class="bg-tg-button text-white px-4 py-2 rounded-lg">$9.99</button>
-                    </div>
-                </div>
+            <div id="buy-stars-page" class="page hidden p-4 text-center">
+                <h2 class="text-xl font-bold mt-10">Buy Stars</h2>
+                <p class="text-tg-hint mt-2">Bu bo'lim tez kunda ishga tushadi.</p>
             </div>
             
-            <!-- History Page -->
-            <div id="history-page" class="page p-4">
-                <h2 class="text-xl font-bold mb-4">Purchase History</h2>
-                <div class="space-y-3">
-                    <div class="bg-tg-secondary-bg p-4 rounded-xl">
-                        <p class="font-semibold">PUBG Conqueror Account</p>
-                        <p class="text-tg-hint text-sm">150 Stars • Completed</p>
-                        <p class="text-tg-hint text-xs">2024-01-15</p>
+            <div id="history-page" class="page hidden p-4 text-center">
+                <h2 class="text-xl font-bold mt-10">History</h2>
+                <p class="text-tg-hint mt-4 text-center">Hozircha amallar mavjud emas.</p>
+            </div>
+
+            <div id="profile-page" class="page hidden">
+                <div id="profile-main">
+                    <div class="flex flex-col items-center p-6">
+                        <img id="profile-photo" class="w-24 h-24 rounded-full border-2 border-tg-link">
+                        <h2 id="profile-name" class="text-2xl font-bold mt-4"></h2>
                     </div>
+                    <div class="px-4 flex flex-col gap-3">
+                        <div onclick="navigateTo({type: 'page', id: 'my-purchases-page'})" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]">
+                            <div class="flex items-center gap-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c.51 0 .962-.328 1.093-.826l1.821-6.831c.13-.483-.145-.996-.644-1.17a48.11 48.11 0 00-1.821-.545A48.11 48.11 0 007.5 4.5M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                                </svg>
+                                <span class="font-medium">Mening Xaridlarim</span>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                        </div>
+                        <div onclick="navigateTo({type: 'subpage', id: 'help-subpage'})" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]">
+                            <div class="flex items-center gap-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                                </svg>
+                                <span class="font-medium">Yordam</span>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                        </div>
+                        <div onclick="navigateTo({type: 'chat', id: 'chat-page'})" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]">
+                            <div class="flex items-center gap-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.325 3.218.086 6.533-.533 9.491-2.311A2.25 2.25 0 0021 18.75V7.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 7.5v1.51z" />
+                                </svg>
+                                <span class="font-medium">Support</span>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div id="help-subpage" class="hidden p-4">
+                    <h2 class="text-xl font-bold text-center mb-4">Ilova haqida</h2>
+                    <p class="text-tg-hint text-center">Bu ilova o'yin akkauntlarini sotib olish va sotish uchun mo'ljallangan platforma.</p>
                 </div>
             </div>
 
-            <!-- Profile Page -->
-            <div id="profile-page" class="page">
-                <div class="flex flex-col items-center p-6">
-                    <img id="profile-photo" class="w-24 h-24 rounded-full border-2 border-tg-link" src="/placeholder.svg?height=96&width=96">
-                    <h2 id="profile-name" class="text-2xl font-bold mt-4">User Name</h2>
-                    <p id="profile-role" class="text-tg-hint mt-1">USER</p>
-                    <div class="flex items-center gap-2 mt-2">
-                        <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M8 0L0 4.66667V14L8 9.33333L16 14V4.66667L8 0Z" fill="currentColor"/>
-                        </svg>
-                        <span id="user-balance" class="font-bold">0</span>
+            <div id="my-purchases-page" class="page hidden p-4">
+                <h2 class="text-xl font-bold">Mening Xaridlarim</h2>
+                <p class="text-tg-hint mt-4 text-center">Bu yerda siz sotib olgan akkauntlarning login va parollari ko'rinadi.</p>
+            </div>
+            
+            <div id="chat-page" class="page hidden flex flex-col h-full">
+                <header class="flex-shrink-0 p-4 bg-tg-secondary-bg flex items-center gap-4 border-b border-gray-700/50">
+                    <img src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full">
+                    <div>
+                        <h3 class="font-bold">Support</h3>
+                        <p class="text-sm text-tg-hint">online</p>
+                    </div>
+                </header>
+                <div id="chat-messages" class="flex-grow p-4 overflow-y-auto flex flex-col">
+                    <div class="message received">
+                        <p>Salom! Sizga qanday yordam bera olaman?</p>
+                        <span class="text-xs opacity-70">10:30</span>
                     </div>
                 </div>
-                <div class="px-4 flex flex-col gap-3">
-                    <div class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer">
-                        <div class="flex items-center gap-4">
+                <footer class="flex-shrink-0 p-2 bg-tg-secondary-bg border-t border-gray-700/50">
+                    <div class="flex items-center gap-2">
+                        <input type="file" id="image-input" accept="image/*" class="hidden">
+                        <button onclick="selectImage()" class="w-10 h-10 bg-tg-bg rounded-full flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c.51 0 .962-.328 1.093-.826l1.821-6.831c.13-.483-.145-.996-.644-1.17a48.11 48.11 0 00-1.821-.545A48.11 48.11 0 007.5 4.5M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                             </svg>
-                            <span class="font-medium">My Purchases</span>
-                        </div>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                        </svg>
-                    </div>
-                    
-                    <div class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer">
-                        <div class="flex items-center gap-4">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.325 3.218.086 6.533-.533 9.491-2.311A2.25 2.25 0 0021 18.75V7.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 7.5v1.51z" />
+                        </button>
+                        <input type="text" id="message-input" placeholder="Xabar yozing..." class="flex-1 bg-tg-bg rounded-full py-2 px-4 focus:outline-none">
+                        <button onclick="sendMessage()" class="w-10 h-10 bg-tg-button rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-white">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                             </svg>
-                            <span class="font-medium">Support</span>
-                        </div>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                        </svg>
+                        </button>
                     </div>
-                </div>
+                </footer>
             </div>
         </main>
         
-        <!-- Bottom Navigation -->
-        <nav id="bottom-nav" class="bg-tg-secondary-bg/90 backdrop-blur-xl border-t border-gray-700/50 flex justify-around items-center">
-            <div data-page="home-page" class="nav-item active flex-1 flex flex-col items-center justify-center cursor-pointer py-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                </svg>
-                <span class="text-xs font-medium">Home</span>
-            </div>
-            
-            <div data-page="buy-stars-page" class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint py-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
-                </svg>
-                <span class="text-xs font-medium">Buy Stars</span>
-            </div>
-            
-            <div data-page="history-page" class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint py-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18.75V7.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 7.5v1.51z" />
-                </svg>
-                <span class="text-xs font-medium">History</span>
-            </div>
-            
-            <div data-page="profile-page" class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint py-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                </svg>
-                <span class="text-xs font-medium">Profile</span>
-            </div>
-        </nav>
+        <footer id="bottom-nav" class="flex-shrink-0 h-16 bg-tg-secondary-bg/80 backdrop-blur-xl border-t border-gray-700/50 flex justify-around items-center"></footer>
     </div>
+    
+    <div id="item-modal" class="fixed inset-0 bg-tg-bg z-50 hidden flex-col transition-opacity duration-300 opacity-0"></div>
 
     <script>
-        // Global variables
-        let currentItems = [];
-        let filteredItems = [];
+        const tg = window.Telegram.WebApp;
+        const navigationStack = []; 
 
-        // Sample items data
-        const sampleItems = [
-            {
-                id: "1001",
-                title: "PUBG Conqueror Account",
-                description: "High-tier PUBG Mobile account with Conqueror rank, rare skins, and premium items.",
-                price: 150,
-                image: "https://via.placeholder.com/300x300/2ea6ff/ffffff?text=PUBG+Conqueror",
-                category: "PUBG",
-                isAdmin: true,
-            },
-            {
-                id: "1002",
-                title: "Free Fire Diamond Account",
-                description: "Free Fire account with 50,000+ diamonds and exclusive characters.",
-                price: 80,
-                image: "https://via.placeholder.com/300x300/e91e63/ffffff?text=Free+Fire+Diamond",
-                category: "Free Fire",
-                isAdmin: false,
-            },
-            {
-                id: "1003",
-                title: "PUBG UC Account",
-                description: "PUBG Mobile account with 8100 UC and premium battle pass.",
-                price: 120,
-                image: "https://via.placeholder.com/300x300/4caf50/ffffff?text=PUBG+UC",
-                category: "PUBG",
-                isAdmin: true,
-            },
-            {
-                id: "1004",
-                title: "Free Fire Elite Pass",
-                description: "Free Fire account with Elite Pass and rare bundles.",
-                price: 45,
-                image: "https://via.placeholder.com/300x300/ff9800/ffffff?text=FF+Elite",
-                category: "Free Fire",
-                isAdmin: false,
-            },
-            {
-                id: "1005",
-                title: "Mobile Legend Mythic",
-                description: "Mobile Legend account with Mythic rank and rare skins.",
-                price: 200,
-                image: "https://via.placeholder.com/300x300/9c27b0/ffffff?text=ML+Mythic",
-                category: "Mobile Legend",
-                isAdmin: true,
-            },
-            {
-                id: "1006",
-                title: "CSGO Prime Account",
-                description: "CSGO Prime account with rare skins and high rank.",
-                price: 300,
-                image: "https://via.placeholder.com/300x300/f44336/ffffff?text=CSGO+Prime",
-                category: "CSGO",
-                isAdmin: false,
-            },
+        const dummyAds = [
+            { id: 3673, title: 'Bonded Ring', price: '80', image: 'https://via.placeholder.com/600x600/2ea6ff/17212b?text=Item1', isAdmin: false, description: 'Juda kuchli uzuk.' },
+            { id: 1550, title: 'Spiced Wine', price: '7.6', image: 'https://via.placeholder.com/600x600/e91e63/17212b?text=Item2', isAdmin: true, description: 'Admin maxsus ichimligi.' },
         ];
 
-        // Initialize app when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('App initializing...');
+        function updateUI(view) {
+            document.querySelectorAll('.page, #item-modal').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('#profile-main, #help-subpage').forEach(el => el.classList.add('hidden'));
+            const bottomNav = document.getElementById('bottom-nav');
             
-            // Initialize Telegram WebApp
-            if (window.Telegram && window.Telegram.WebApp) {
-                const tg = window.Telegram.WebApp;
-                tg.ready();
-                tg.expand();
+            if (view.type === 'page') {
+                const pageEl = document.getElementById(view.id);
+                pageEl.classList.remove('hidden');
+                if (view.id === 'profile-page') {
+                    pageEl.querySelector('#profile-main').classList.remove('hidden');
+                }
+                bottomNav.classList.remove('hidden');
+            } else if (view.type === 'modal') {
+                const modalEl = document.getElementById(view.id);
+                modalEl.classList.remove('hidden');
+                setTimeout(() => modalEl.classList.add('opacity-100'), 10);
+                bottomNav.classList.add('hidden');
+            } else if (view.type === 'subpage') {
+                const parentPage = document.getElementById('profile-page');
+                parentPage.classList.remove('hidden');
+                document.getElementById(view.id).classList.remove('hidden');
+                bottomNav.classList.add('hidden');
+            } else if (view.type === 'chat') {
+                // Chat sahifasi uchun maxsus qoida - bottom nav yashiriladi
+                const pageEl = document.getElementById(view.id);
+                pageEl.classList.remove('hidden');
+                bottomNav.classList.add('hidden');
             }
 
-            // Load sample data
-            currentItems = sampleItems;
-            filteredItems = sampleItems;
-            renderItems(sampleItems);
-
-            // Initialize Swiper
-            if (window.Swiper) {
-                setTimeout(() => {
-                    new window.Swiper('.swiper', {
-                        loop: true,
-                        autoplay: {
-                            delay: 3000,
-                            disableOnInteraction: false,
-                        },
-                        pagination: {
-                            el: '.swiper-pagination',
-                            clickable: true,
-                        },
-                        effect: 'slide',
-                        speed: 500,
-                    });
-                    console.log('Swiper initialized');
-                }, 500);
+            if (navigationStack.length > 1) {
+                tg.BackButton.show();
+            } else {
+                tg.BackButton.hide();
             }
+        }
 
-            // Initialize navigation
-            initializeNavigation();
+        function navigateTo(view) {
+            navigationStack.push(view);
+            updateUI(view);
+        }
+
+        function handleBackPress() {
+            if (navigationStack.length > 1) {
+                const currentView = navigationStack.pop();
+                if (currentView.type === 'modal') {
+                    const modal = document.getElementById(currentView.id);
+                    modal.classList.remove('opacity-100');
+                    setTimeout(() => { modal.classList.add('hidden'); }, 300);
+                }
+                const previousView = navigationStack[navigationStack.length - 1];
+                updateUI(previousView);
+            }
+        }
+        
+        function openModal(adId) {
+            const ad = dummyAds.find(item => item.id === adId);
+            if (!ad) return;
+            const modal = document.getElementById('item-modal');
+            modal.innerHTML = `
+                <div class="h-full w-full flex flex-col">
+                    <div class="flex-grow overflow-y-auto">
+                        <img src="${ad.image}" class="w-full aspect-square object-cover">
+                        <div class="p-4">
+                            <h2 class="text-3xl font-bold mb-2">${ad.title}</h2>
+                            <p class="text-lg text-tg-hint mb-4">#${ad.id}</p>
+                            <p class="text-base leading-relaxed">${ad.description}</p>
+                        </div>
+                    </div>
+                    <footer class="flex-shrink-0 p-4 border-t border-gray-700/50 bg-tg-bg">
+                        ${ad.isAdmin ? 
+                            `<button class="w-full bg-tg-button text-tg-button-text font-bold py-4 rounded-xl">Sotib olish (${ad.price} Stars)</button>` :
+                            `<div class="flex gap-3">
+                                <button class="flex-1 bg-white/10 text-tg-text font-bold py-4 rounded-xl">To'g'ridan-to'g'ri</button>
+                                <button class="flex-1 bg-tg-button text-tg-button-text font-bold py-4 rounded-xl">Admin Orqali</button>
+                            </div>`
+                        }
+                    </footer>
+                </div>`;
+            navigateTo({type: 'modal', id: 'item-modal'});
+        }
+
+        // Chat functions
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage(message, 'sent');
+            input.value = '';
+
+            // Simulate response after 1 second
+            setTimeout(() => {
+                addMessage('Rahmat! Sizning xabaringiz qabul qilindi. Tez orada javob beramiz.', 'received');
+            }, 1000);
+        }
+
+        function addMessage(text, type, imageUrl = null) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
             
-            // Initialize category filters
-            initializeCategoryFilters();
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+            
+            let content = `<p>${text}</p>`;
+            if (imageUrl) {
+                content += `<img src="${imageUrl}" alt="Sent image">`;
+            }
+            content += `<span class="text-xs opacity-70">${time}</span>`;
+            
+            messageDiv.innerHTML = content;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
 
-            console.log('App initialized successfully');
+        function selectImage() {
+            document.getElementById('image-input').click();
+        }
+
+        // Handle image selection
+        document.addEventListener('change', function(e) {
+            if (e.target.id === 'image-input') {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        addMessage('Rasm yuborildi', 'sent', e.target.result);
+                        
+                        // Simulate response
+                        setTimeout(() => {
+                            addMessage('Rasm qabul qilindi. Rahmat!', 'received');
+                        }, 1000);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
         });
 
-        // Navigation function
-        function initializeNavigation() {
-            const navItems = document.querySelectorAll('.nav-item');
-            
-            navItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    const pageId = this.getAttribute('data-page');
-                    showPage(pageId);
-                });
-            });
-        }
+        // Handle Enter key in message input
+        document.addEventListener('keypress', function(e) {
+            if (e.target.id === 'message-input' && e.key === 'Enter') {
+                sendMessage();
+            }
+        });
 
-        // Show page function
-        function showPage(pageId) {
-            console.log('Showing page:', pageId);
+        document.addEventListener('DOMContentLoaded', function () {
+            tg.ready();
+            tg.setHeaderColor('secondary_bg_color'); 
+            tg.setBackgroundColor('secondary_bg_color');
+            tg.expand();
+            tg.onEvent('backButtonClicked', handleBackPress);
 
-            // Hide all pages
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-
-            // Show selected page
-            const targetPage = document.getElementById(pageId);
-            if (targetPage) {
-                targetPage.classList.add('active');
+            const user = tg.initDataUnsafe?.user;
+            if (user) {
+                const profilePhoto = document.getElementById('profile-photo');
+                if (user.photo_url) { 
+                    profilePhoto.src = user.photo_url; 
+                } else { 
+                    profilePhoto.classList.add('hidden'); 
+                }
+                document.getElementById('profile-name').textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
             }
 
-            // Update navigation active state
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-                item.classList.add('text-tg-hint');
-            });
+            new Swiper('.swiper', { loop: true, autoplay: { delay: 3000 } });
 
-            // Find and activate current nav item
-            const currentNavItem = document.querySelector(`[data-page="${pageId}"]`);
-            if (currentNavItem) {
-                currentNavItem.classList.add('active');
-                currentNavItem.classList.remove('text-tg-hint');
-            }
-        }
-
-        // Category filters
-        function initializeCategoryFilters() {
-            const categoryButtons = document.querySelectorAll('.category-btn');
-            
-            categoryButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const category = this.getAttribute('data-category');
-                    filterItems(category);
-                });
-            });
-        }
-
-        // Filter items function
-        function filterItems(category) {
-            console.log('Filtering by category:', category);
-
-            // Update button styles
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.classList.remove('bg-tg-button', 'text-white', 'active');
-                btn.classList.add('bg-tg-secondary-bg', 'text-tg-text');
-            });
-
-            // Find and activate the correct button
-            const activeButton = document.querySelector(`[data-category="${category}"]`);
-            if (activeButton) {
-                activeButton.classList.remove('bg-tg-secondary-bg', 'text-tg-text');
-                activeButton.classList.add('bg-tg-button', 'text-white', 'active');
-            }
-
-            // Filter items
-            let itemsToShow = currentItems;
-            if (category !== 'all') {
-                itemsToShow = currentItems.filter(item => item.category === category);
-            }
-
-            renderItems(itemsToShow);
-        }
-
-        // Render items function
-        function renderItems(items) {
-            const container = document.getElementById('items-container');
-            if (!container) return;
-
-            container.innerHTML = items.map((item, index) => `
-                <div onclick="openItemModal('${item.id}')" class="flex flex-col rounded-2xl ${item.isAdmin ? 'bg-blue-900/40' : 'bg-tg-secondary-bg'} overflow-hidden transition-transform active:scale-95 cursor-pointer opacity-0" style="animation: fade-in 0.5s ease forwards ${index * 0.1}s;">
-                    <img class="w-full h-auto aspect-square object-cover" src="${item.image}" alt="${item.title}">
+            const container = document.getElementById('card-container');
+            container.innerHTML = dummyAds.map((ad, index) => `
+                <div onclick="openModal(${ad.id})" class="flex flex-col rounded-2xl ${ad.isAdmin ? 'bg-blue-900/40' : 'bg-tg-bg'} overflow-hidden transition-transform active:scale-95 cursor-pointer opacity-0" style="animation: fade-in 0.5s ease forwards ${index * 0.1}s;">
+                    <img class="w-full h-auto aspect-square object-cover" src="${ad.image}" alt="${ad.title}">
                     <div class="p-3">
-                        <p class="font-semibold truncate">${item.title}</p>
-                        <p class="text-xs text-tg-hint">#${item.id}</p>
+                        <p class="font-semibold truncate">${ad.title}</p>
+                        <p class="text-xs text-tg-hint">#${ad.id}</p>
                         <div class="flex justify-between items-center mt-3">
                             <div class="flex items-center gap-1.5 bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-bold py-2 px-3 rounded-lg">
                                 <svg class="w-4 h-4" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M8 0L0 4.66667V14L8 9.33333L16 14V4.66667L8 0Z" fill="white"/>
                                 </svg>
-                                ${item.price}
+                                ${ad.price}
                             </div>
                             <div class="w-9 h-9 flex items-center justify-center bg-white/10 rounded-lg">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-white">
@@ -461,85 +383,39 @@
                     </div>
                 </div>
             `).join('');
-        }
+            
+            const navItems = [
+                { id: 'home-page', label: 'Home', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>' },
+                { id: 'buy-stars-page', label: 'Buy Stars', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>' },
+                { id: 'history-page', label: 'History', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>' },
+                { id: 'profile-page', label: 'Profile', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>' }
+            ];
 
-        // Open item modal
-        function openItemModal(itemId) {
-            const item = currentItems.find(i => i.id === itemId);
-            if (!item) return;
+            const navContainer = document.getElementById('bottom-nav');
+            navContainer.innerHTML = ''; 
 
-            console.log('Opening modal for item:', item.title);
+            navItems.forEach(item => {
+                const navElement = document.createElement('div');
+                navElement.className = 'nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint';
+                navElement.innerHTML = `<div class="w-6 h-6">${item.icon}</div><span class="text-xs font-medium">${item.label}</span>`;
+                
+                navElement.addEventListener('click', () => {
+                    navigationStack.length = 0;
+                    navigateTo({type: 'page', id: item.id});
+                    
+                    document.querySelectorAll('#bottom-nav .nav-item').forEach(i => i.classList.remove('active'));
+                    navElement.classList.add('active');
+                });
+                navContainer.appendChild(navElement);
+            });
 
-            // Create modal HTML
-            const modalHTML = `
-                <div class="fixed inset-0 bg-black/50 z-50 flex items-end justify-center p-4" onclick="closeModal(event)">
-                    <div class="bg-tg-bg rounded-t-3xl w-full max-w-md max-h-[80vh] overflow-hidden" onclick="event.stopPropagation()">
-                        <div class="p-4 border-b border-gray-700/50">
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-lg font-bold">Item Details</h3>
-                                <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-700/50">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="overflow-y-auto max-h-96">
-                            <img src="${item.image}" class="w-full aspect-square object-cover" alt="${item.title}">
-                            <div class="p-4">
-                                <h2 class="text-xl font-bold mb-2">${item.title}</h2>
-                                <p class="text-tg-hint mb-2">#${item.id}</p>
-                                <p class="text-sm leading-relaxed mb-4">${item.description}</p>
-                                <div class="bg-tg-secondary-bg p-3 rounded-lg mb-4">
-                                    <p class="text-sm text-tg-hint mb-1">Category</p>
-                                    <p class="font-medium">${item.category}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="p-4 border-t border-gray-700/50">
-                            <button onclick="purchaseItem('${item.id}')" class="w-full bg-tg-button text-white font-bold py-3 rounded-xl">
-                                Buy for ${item.price} Stars
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            // Add modal to body
-            const modalDiv = document.createElement('div');
-            modalDiv.id = 'item-modal';
-            modalDiv.innerHTML = modalHTML;
-            document.body.appendChild(modalDiv);
-        }
-
-        // Close modal
-        function closeModal(event) {
-            if (event && event.target !== event.currentTarget) return;
-
-            const modal = document.getElementById('item-modal');
-            if (modal) {
-                modal.remove();
+            document.querySelector('#bottom-nav .nav-item').classList.add('active');
+            
+            // Boshlang'ich sahifani o'rnatish
+            if (navigationStack.length === 0) {
+                navigateTo({type: 'page', id: 'home-page'});
             }
-        }
-
-        // Purchase item
-        function purchaseItem(itemId) {
-            const item = currentItems.find(i => i.id === itemId);
-            if (!item) return;
-
-            console.log('Purchasing item:', item.title);
-
-            // Show success message
-            if (window.Telegram && window.Telegram.WebApp) {
-                window.Telegram.WebApp.showAlert(`Successfully purchased ${item.title} for ${item.price} stars!`);
-            } else {
-                alert(`Successfully purchased ${item.title} for ${item.price} stars!`);
-            }
-
-            closeModal();
-        }
-
-        console.log('Script loaded successfully');
+        });
     </script>
 </body>
 </html>
