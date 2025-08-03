@@ -95,9 +95,7 @@
 
     <div id="app">
         <main>
-            <!-- Home Page -->
             <div id="home-page" class="page active">
-                <!-- Banner Section -->
                 <div class="swiper h-48">
                     <div class="swiper-wrapper" id="banner-container">
                         <div class="swiper-slide">
@@ -113,7 +111,6 @@
                     <div class="swiper-pagination"></div>
                 </div>
                 
-                <!-- Categories -->
                 <div class="px-4 py-3">
                     <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2" id="category-filters">
                         <button data-category="all" class="category-btn active bg-tg-button text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">All</button>
@@ -124,17 +121,14 @@
                     </div>
                 </div>
                 
-                <!-- Items Grid -->
                 <div class="flex justify-between items-center px-4 pt-1 pb-3">
                     <h2 class="text-2xl font-bold tracking-tight">All Items</h2>
                     <div id="loading-indicator" class="loading hidden"></div>
                 </div>
                 <div id="items-container" class="px-4 pb-4 grid grid-cols-2 gap-4">
-                    <!-- Items will be loaded here -->
-                </div>
+                    </div>
             </div>
 
-            <!-- Buy Stars Page -->
             <div id="buy-stars-page" class="page p-4">
                 <h2 class="text-xl font-bold text-center mb-6">Buy Stars</h2>
                 <div id="star-packages" class="space-y-4">
@@ -162,7 +156,6 @@
                 </div>
             </div>
             
-            <!-- History Page -->
             <div id="history-page" class="page p-4">
                 <h2 class="text-xl font-bold mb-4">Purchase History</h2>
                 <div class="space-y-3">
@@ -174,7 +167,6 @@
                 </div>
             </div>
 
-            <!-- Profile Page -->
             <div id="profile-page" class="page">
                 <div class="flex flex-col items-center p-6">
                     <img id="profile-photo" class="w-24 h-24 rounded-full border-2 border-tg-link" src="/placeholder.svg?height=96&width=96">
@@ -214,8 +206,7 @@
                 </div>
             </div>
 
-            <!-- Chat Page -->
-            <div id="chat-page" class="page hidden flex flex-col h-full">
+            <div id="chat-page" class="page flex flex-col h-full">
                 <div class="p-4 border-b border-gray-700/50 flex-shrink-0">
                     <div class="flex items-center gap-4">
                         <button onclick="navigationBack()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-700/50">
@@ -227,8 +218,7 @@
                     </div>
                 </div>
                 <div class="overflow-y-auto p-4 flex-1">
-                    <!-- Chat messages will be displayed here -->
-                </div>
+                    </div>
                 <footer class="flex-shrink-0 p-2 bg-tg-secondary-bg flex items-center gap-2 border-t border-gray-700/50">
                     <button id="attach-btn" class="w-10 h-10 bg-tg-bg rounded-full flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint">
@@ -246,7 +236,6 @@
             </div>
         </main>
         
-        <!-- Bottom Navigation -->
         <nav id="bottom-nav" class="bg-tg-secondary-bg/90 backdrop-blur-xl border-t border-gray-700/50 flex justify-around items-center">
             <div data-page="home-page" class="nav-item active flex-1 flex flex-col items-center justify-center cursor-pointer py-2">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1">
@@ -385,9 +374,6 @@
             // Initialize category filters
             initializeCategoryFilters();
 
-            // Bosh sahifani yuklash
-            pushView({ type: 'page', id: 'home-page' });
-
             // Rasm jo'natish funksiyalari
             document.getElementById('attach-btn').addEventListener('click', function() {
                 document.getElementById('file-input').click();
@@ -462,7 +448,9 @@
             navItems.forEach(item => {
                 item.addEventListener('click', function() {
                     const pageId = this.getAttribute('data-page');
-                    pushView({ type: 'page', id: pageId });
+                    // Bosh sahifani almashtirishda stackni tozalash
+                    navigationStack = [{ type: 'page', id: pageId }];
+                    updateUI(navigationStack[0]);
                 });
             });
         }
@@ -481,56 +469,43 @@
             updateUI(view);
         }
 
-        // Update UI function
+        // ==========================================================
+        // ✅✅✅ ASOSIY O'ZGARISH MANA SHU FUNKSIYADA ✅✅✅
+        // ==========================================================
         function updateUI(view) {
-            document.querySelectorAll('.page, #item-modal').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('#profile-main, #help-subpage').forEach(el => el.classList.add('hidden'));
-            const bottomNav = document.getElementById('bottom-nav');
+            // 1. Barcha sahifalardan 'active' klassini olib tashlash
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
             
-            if (view.type === 'page') {
-                const pageEl = document.getElementById(view.id);
-                pageEl.classList.remove('hidden');
-                if (view.id === 'profile-page') {
-                    pageEl.querySelector('#profile-main').classList.remove('hidden');
-                }
-                
-                // Chat page uchun bottom nav yashirish
-                if (view.id === 'chat-page') {
-                    bottomNav.classList.add('hidden');
-                } else {
-                    bottomNav.classList.remove('hidden');
-                }
-            } else if (view.type === 'modal') {
-                const modalEl = document.getElementById(view.id);
-                modalEl.classList.remove('hidden');
-                setTimeout(() => modalEl.classList.add('opacity-100'), 10);
-                bottomNav.classList.add('hidden');
-            } else if (view.type === 'subpage') {
-                const parentPage = document.getElementById('profile-page');
-                parentPage.classList.remove('hidden');
-                document.getElementById(view.id).classList.remove('hidden');
-                bottomNav.classList.add('hidden');
-            }
-            
-            if (navigationStack.length > 1) {
-                tg.BackButton.show();
-            } else {
-                tg.BackButton.hide();
+            // 2. Faqat kerakli sahifaga 'active' klassini qo'shish
+            const pageEl = document.getElementById(view.id);
+            if (pageEl) {
+                pageEl.classList.add('active');
             }
 
-            // Update navigation active state
+            // 3. Pastki navigatsiya tugmalaridan 'active' klassini olib tashlash
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
                 item.classList.add('text-tg-hint');
             });
 
-            // Find and activate current nav item
-            const currentNavItem = document.querySelector(`[data-page="${view.id}"]`);
+            // 4. Joriy sahifaga mos keluvchi navigatsiya tugmasiga 'active' klassini qo'shish
+            const currentNavItem = document.querySelector(`.nav-item[data-page="${view.id}"]`);
             if (currentNavItem) {
                 currentNavItem.classList.add('active');
                 currentNavItem.classList.remove('text-tg-hint');
             }
+
+            // Telegram orqaga qaytish tugmasini boshqarish
+            if (navigationStack.length > 1) {
+                window.Telegram.WebApp.BackButton.show();
+            } else {
+                window.Telegram.WebApp.BackButton.hide();
+            }
         }
+        // ==========================================================
+
 
         // Category filters
         function initializeCategoryFilters() {
