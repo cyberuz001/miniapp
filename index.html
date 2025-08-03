@@ -61,11 +61,14 @@
             background: var(--tg-theme-secondary-bg-color, #222e3a) !important;
             backdrop-filter: blur(10px) !important;
             border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+            height: 64px !important;
         }
 
         /* Adjust main content to account for fixed bottom nav */
         main {
             padding-bottom: 80px !important;
+            height: calc(100vh - 64px) !important;
+            overflow-y: auto !important;
         }
 
         /* Ensure proper spacing for pages */
@@ -73,9 +76,15 @@
             min-height: calc(100vh - 80px);
             padding-bottom: 20px;
         }
+
+        /* Fix app container */
+        #app {
+            height: 100vh !important;
+            overflow: hidden !important;
+        }
     </style>
 </head>
-<body class="bg-tg-bg text-tg-text font-sans antialiased overflow-hidden">
+<body class="bg-tg-bg text-tg-text font-sans antialiased">
 
     <div id="app" class="h-screen w-screen flex flex-col">
         <main class="flex-grow overflow-y-auto">
