@@ -31,7 +31,13 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        body { overflow: hidden; }
+        body {
+            overflow: hidden;
+            -webkit-user-select: none; /* Safari, Chrome */
+            -moz-user-select: none;    /* Firefox */
+            -ms-user-select: none;     /* Internet Explorer/Edge */
+            user-select: none; 
+             }
 
         /* 1. Barcha sahifalarni sukut bo'yicha yashiramiz */
         .page {
