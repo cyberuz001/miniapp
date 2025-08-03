@@ -8,6 +8,65 @@ let filteredItems = []
 let currentCategories = []
 const Swiper = window.Swiper // Declare Swiper variable
 
+// Page navigation function - GLOBAL FUNCTION
+window.showPage = (pageId) => {
+  console.log("Showing page:", pageId)
+
+  // Hide all pages
+  document.querySelectorAll(".page").forEach((page) => {
+    page.classList.remove("active")
+  })
+
+  // Show selected page
+  const targetPage = document.getElementById(pageId)
+  if (targetPage) {
+    targetPage.classList.add("active")
+    console.log("Page activated:", pageId)
+  } else {
+    console.error("Page not found:", pageId)
+  }
+
+  // Update navigation active state
+  document.querySelectorAll(".nav-item").forEach((item) => {
+    item.classList.remove("active")
+    item.classList.add("text-tg-hint")
+  })
+
+  // Find and activate current nav item
+  const currentNavItem = document.querySelector(`[onclick="showPage('${pageId}')"]`)
+  if (currentNavItem) {
+    currentNavItem.classList.add("active")
+    currentNavItem.classList.remove("text-tg-hint")
+    console.log("Nav item activated for:", pageId)
+  }
+}
+
+// Filter function - GLOBAL FUNCTION
+window.filterItems = (category) => {
+  console.log("Filtering by category:", category)
+
+  // Update button styles
+  document.querySelectorAll(".category-btn").forEach((btn) => {
+    btn.classList.remove("bg-tg-button", "text-white", "active")
+    btn.classList.add("bg-tg-secondary-bg", "text-tg-text")
+  })
+
+  // Find and activate the correct button
+  const activeButton = document.querySelector(`[onclick="filterItems('${category}')"]`)
+  if (activeButton) {
+    activeButton.classList.remove("bg-tg-secondary-bg", "text-tg-text")
+    activeButton.classList.add("bg-tg-button", "text-white", "active")
+  }
+
+  // Filter items
+  let itemsToShow = currentItems
+  if (category !== "all") {
+    itemsToShow = currentItems.filter((item) => item.category === category)
+  }
+
+  renderItems(itemsToShow)
+}
+
 // Declare functions before using them
 function navigateTo(view) {
   navigationStack.push(view)
@@ -72,7 +131,10 @@ function showPage(pageId) {
 
 function renderBanners(banners) {
   const container = document.getElementById("banner-container")
-  if (!container) return
+  if (!container) {
+    console.error("Banner container not found!")
+    return
+  }
 
   container.innerHTML = banners
     .map(
@@ -87,22 +149,28 @@ function renderBanners(banners) {
   // Initialize Swiper after content is loaded
   setTimeout(() => {
     if (window.Swiper) {
-      new window.Swiper(".swiper", {
-        loop: true,
-        autoplay: {
-          delay: 3000,
-          disableOnInteraction: false,
-        },
-        pagination: {
-          el: ".swiper-pagination",
-          clickable: true,
-        },
-        effect: "slide",
-        speed: 500,
-      })
-      console.log("Swiper initialized successfully")
+      try {
+        const swiper = new window.Swiper(".swiper", {
+          loop: true,
+          autoplay: {
+            delay: 3000,
+            disableOnInteraction: false,
+          },
+          pagination: {
+            el: ".swiper-pagination",
+            clickable: true,
+          },
+          effect: "slide",
+          speed: 500,
+        })
+        console.log("Swiper initialized successfully:", swiper)
+      } catch (error) {
+        console.error("Swiper initialization failed:", error)
+      }
+    } else {
+      console.error("Swiper library not loaded!")
     }
-  }, 100)
+  }, 500)
 }
 
 function renderStarPackages(packages) {
