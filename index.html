@@ -6,9 +6,9 @@
     <title>Game Market</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -30,98 +30,71 @@
             from { opacity: 0; transform: translateY(1rem); } 
             to { opacity: 1; transform: translateY(0); } 
         }
-        
         .nav-item.active, .lang-btn.active {
-            color: var(--tg-theme-link-color, #62bcf9) !important;
+            color: var(--tg-theme-link-color, #62bcf9);
         }
-        
+        .category-btn.active {
+            background-color: var(--tg-theme-button-color, #5288c1);
+            color: var(--tg-theme-button-text-color, #ffffff);
+        }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        body {
-            margin: 0; padding: 0; height: 100vh; overflow: hidden;
-        }
-        #app {
-            height: 100vh; display: flex; flex-direction: column;
-        }
-        main {
-            flex: 1; overflow-y: auto; padding-bottom: 80px;
-        }
-        #bottom-nav {
-            height: 64px; flex-shrink: 0; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;
-        }
+        body { overflow: hidden; }
+        main { padding-bottom: 70px; }
         .page { display: none; }
         .page.active { display: block; }
     </style>
 </head>
 <body class="bg-tg-bg text-tg-text font-sans antialiased">
 
-    <div id="app">
-        <main>
+    <div id="app" class="h-screen w-screen flex flex-col">
+        <main class="flex-grow overflow-y-auto">
             <div id="home-page" class="page active">
                 <div class="swiper h-48">
-                    <div class="swiper-wrapper" id="banner-container">
-                         </div>
-                    <div class="swiper-pagination"></div>
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide"><img src="https://via.placeholder.com/600x360/2ea6ff/ffffff?text=Top+O'yinlar" class="w-full h-full object-cover"></div>
+                        <div class="swiper-slide"><img src="https://via.placeholder.com/600x360/333333/ffffff?text=Aksiya" class="w-full h-full object-cover"></div>
+                    </div>
                 </div>
-                
                 <div class="px-4 py-3">
-                    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2" id="category-filters">
-                         </div>
+                    <div id="category-container" class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+                        </div>
                 </div>
-                
                 <div class="flex justify-between items-center px-4 pt-1 pb-3">
                     <h2 class="text-2xl font-bold tracking-tight" data-translate-key="all_items">All Items</h2>
                 </div>
-                <div id="items-container" class="px-4 pb-4 grid grid-cols-2 gap-4">
-                    </div>
+                <div id="card-container" class="px-4 pb-4 grid grid-cols-2 gap-4"></div>
             </div>
 
-            <div id="buy-stars-page" class="page p-4">
-                <h2 class="text-xl font-bold text-center mb-6" data-translate-key="buy_stars">Buy Stars</h2>
-                <div id="star-packages" class="space-y-4">
-                     </div>
+            <div id="buy-stars-page" class="page p-4 text-center">
+                <h2 class="text-xl font-bold mt-10" data-translate-key="buy_stars">Buy Stars</h2>
+                <p class="text-tg-hint mt-2" data-translate-key="coming_soon">This section will be available soon.</p>
             </div>
             
-            <div id="history-page" class="page p-4">
-                <h2 class="text-xl font-bold mb-4" data-translate-key="purchase_history">Purchase History</h2>
-                <div id="purchase-history-container" class="space-y-3">
-                    </div>
+            <div id="history-page" class="page p-4 text-center">
+                <h2 class="text-xl font-bold mt-10" data-translate-key="history">History</h2>
+                <p class="text-tg-hint mt-2" data-translate-key="no_history">No transactions yet.</p>
             </div>
 
             <div id="profile-page" class="page">
                 <div class="flex flex-col items-center p-6">
-                    <img id="profile-photo" class="w-24 h-24 rounded-full border-2 border-tg-link" src="https://via.placeholder.com/96">
-                    <h2 id="profile-name" class="text-2xl font-bold mt-4">User Name</h2>
-                    <p id="profile-role" class="text-tg-hint mt-1">USER</p>
-                    <div class="flex items-center gap-2 mt-2">
-                        <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 0L0 4.66667V14L8 9.33333L16 14V4.66667L8 0Z" fill="currentColor"/></svg>
-                        <span id="user-balance" class="font-bold">0</span>
-                    </div>
+                    <img id="profile-photo" class="w-24 h-24 rounded-full border-2 border-tg-link">
+                    <h2 id="profile-name" class="text-2xl font-bold mt-4"></h2>
                 </div>
                 <div class="px-4 flex flex-col gap-3">
-                    <div id="my-purchases-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer">
-                        <div class="flex items-center gap-4">
-                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c.51 0 .962-.328 1.093-.826l1.821-6.831c.13-.483-.145-.996-.644-1.17a48.11 48.11 0 00-1.821-.545A48.11 48.11 0 007.5 4.5M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" /></svg>
-                            <span class="font-medium" data-translate-key="my_purchases">My Purchases</span>
-                        </div>
+                    <div id="my-purchases-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer active:scale-[0.98]">
+                        <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c.51 0 .962-.328 1.093-.826l1.821-6.831c.13-.483-.145-.996-.644-1.17a48.11 48.11 0 00-1.821-.545A48.11 48.11 0 007.5 4.5M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" /></svg><span class="font-medium" data-translate-key="my_purchases">My Purchases</span></div>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
                     </div>
-                     <div id="help-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer">
-                        <div class="flex items-center gap-4">
-                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
-                           <span class="font-medium" data-translate-key="help">Help</span>
-                        </div>
+                    <div id="help-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer active:scale-[0.98]">
+                        <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg><span class="font-medium" data-translate-key="help">Help</span></div>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
                     </div>
-                    <div id="support-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer">
-                        <div class="flex items-center gap-4">
-                           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.325 3.218.086 6.533-.533 9.491-2.311A2.25 2.25 0 0021 18.75V7.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 7.5v1.51z" /></svg>
-                           <span class="font-medium" data-translate-key="support">Support</span>
-                        </div>
+                    <div id="support-btn" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer active:scale-[0.98]">
+                        <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.325 3.218.086 6.533-.533 9.491-2.311A2.25 2.25 0 0021 18.75V7.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 7.5v1.51z" /></svg><span class="font-medium" data-translate-key="support">Support</span></div>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-tg-hint"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
                     </div>
-                    <div class="bg-tg-secondary-bg p-4 rounded-xl">
+                     <div class="bg-tg-secondary-bg p-4 rounded-xl">
                         <h3 class="font-medium mb-3" data-translate-key="language">Language</h3>
                         <div class="flex justify-around">
                            <button onclick="setLanguage('uz')" class="lang-btn text-tg-hint font-semibold">UZ</button>
@@ -139,304 +112,204 @@
                     </div>
             </div>
 
-             <div id="help-page" class="page p-4">
-                <h2 class="text-xl font-bold mb-4" data-translate-key="help_title">Help Center</h2>
-                <p data-translate-key="help_content">If you have any questions, please contact our support team. We are here to help you 24/7.</p>
+            <div id="help-page" class="page p-4">
+                <h2 class="text-xl font-bold text-center mb-4" data-translate-key="help_title">Help Center</h2>
+                <p class="text-tg-hint text-center" data-translate-key="help_content">If you have any questions, please contact our support team. We are here to help you 24/7.</p>
             </div>
-
+            
             <div id="chat-page" class="page flex flex-col h-full">
-                <h2 class="text-xl font-bold p-4" data-translate-key="support_chat">Support Chat</h2>
-                <div class="overflow-y-auto p-4 flex-1" id="chat-messages-container">
-                    </div>
+                <header class="flex-shrink-0 p-4 bg-tg-secondary-bg flex items-center gap-4 border-b border-gray-700/50">
+                    <img src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full">
+                    <div><h3 class="font-bold" data-translate-key="support">Support</h3><p class="text-sm text-tg-hint">online</p></div>
+                </header>
+                <div class="flex-grow p-4 overflow-y-auto">
+                    <div class="text-center text-tg-hint text-sm" data-translate-key="chat_placeholder">This is a chat placeholder. Real messages will work after connecting to a backend.</div>
+                </div>
                 <footer class="flex-shrink-0 p-2 bg-tg-secondary-bg flex items-center gap-2 border-t border-gray-700/50">
-                    <input type="text" id="message-input" placeholder="Message..." data-translate-key="message_placeholder" class="flex-1 bg-tg-bg rounded-full py-2 px-4 focus:outline-none">
-                    <button id="send-btn" class="w-10 h-10 bg-tg-button rounded-full flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-white"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg>
-                    </button>
+                    <input type="text" data-translate-key="message_placeholder" placeholder="Write a message..." class="w-full bg-tg-bg rounded-full py-2 px-4 focus:outline-none">
+                    <button class="w-10 h-10 bg-tg-button rounded-full flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-white"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" /></svg></button>
                 </footer>
             </div>
         </main>
         
-        <nav id="bottom-nav" class="bg-tg-secondary-bg/90 backdrop-blur-xl border-t border-gray-700/50 flex justify-around items-center">
-            <div data-page="home-page" class="nav-item active flex-1 flex flex-col items-center justify-center cursor-pointer py-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
-                <span class="text-xs font-medium" data-translate-key="home">Home</span>
-            </div>
-            
-            <div data-page="buy-stars-page" class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint py-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>
-                <span class="text-xs font-medium" data-translate-key="buy_stars_nav">Buy Stars</span>
-            </div>
-            
-            <div data-page="history-page" class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint py-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18.75V7.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 7.5v1.51z" /></svg>
-                <span class="text-xs font-medium" data-translate-key="history">History</span>
-            </div>
-            
-            <div data-page="profile-page" class="nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint py-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mb-1"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
-                <span class="text-xs font-medium" data-translate-key="profile">Profile</span>
-            </div>
-        </nav>
+        <footer id="bottom-nav" class="flex-shrink-0 h-16 bg-tg-secondary-bg/80 backdrop-blur-xl border-t border-gray-700/50 flex justify-around items-center">
+            </footer>
     </div>
+    
+    <div id="item-modal-container"></div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        let navigationStack = [];
-        
-        // ==========================================================
-        // ✅ TIL UCHUN LUG'AT (DICTIONARY)
-        // ==========================================================
-        const translations = {
-            'uz': {
-                home: 'Bosh sahifa', all_items: 'Barcha mahsulotlar', buy_stars_nav: 'Yulduzlar',
-                history: 'Tarix', profile: 'Profil', buy_stars: 'Yulduz Sotib Olish',
-                purchase_history: "Xaridlar Tarixi", my_purchases: "Mening xaridlarim",
-                help: "Yordam", support: "Qo'llab-quvvatlash", language: "Til",
-                help_title: "Yordam Markazi", help_content: "Savollaringiz bo'lsa, qo'llab-quvvatlash xizmatimizga murojaat qiling. Biz sizga 24/7 yordam berishga tayyormiz.",
-                support_chat: "Qo'llab-quvvatlash Chati", message_placeholder: "Xabar...",
-                purchased_account_details: "Sotib olingan akkaunt ma'lumotlari", login: "Login", password: "Parol",
-                info: "Ma'lumot"
-            },
-            'ru': {
-                home: 'Главная', all_items: 'Все товары', buy_stars_nav: 'Звезды',
-                history: 'История', profile: 'Профиль', buy_stars: 'Купить Звезды',
-                purchase_history: "История Покупок", my_purchases: "Мои покупки",
-                help: "Помощь", support: "Поддержка", language: "Язык",
-                help_title: "Центр помощи", help_content: "Если у вас есть вопросы, обратитесь в нашу службу поддержки. Мы готовы помочь вам 24/7.",
-                support_chat: "Чат с поддержкой", message_placeholder: "Сообщение...",
-                purchased_account_details: "Данные купленного аккаунта", login: "Логин", password: "Пароль",
-                info: "Информация"
-            },
-            'en': {
-                home: 'Home', all_items: 'All Items', buy_stars_nav: 'Stars',
-                history: 'History', profile: 'Profile', buy_stars: 'Buy Stars',
-                purchase_history: "Purchase History", my_purchases: "My Purchases",
-                help: "Help", support: "Support", language: "Language",
-                help_title: "Help Center", help_content: "If you have any questions, please contact our support team. We are here to help you 24/7.",
-                support_chat: "Support Chat", message_placeholder: "Message...",
-                purchased_account_details: "Purchased Account Details", login: "Login", password: "Password",
-                info: "Information"
-            },
-            'ja': {
-                home: 'ホーム', all_items: 'すべての商品', buy_stars_nav: 'スター',
-                history: '履歴', profile: 'プロフィール', buy_stars: 'スターを購入',
-                purchase_history: "購入履歴", my_purchases: "私の購入",
-                help: "ヘルプ", support: "サポート", language: "言語",
-                help_title: "ヘルプセンター", help_content: "ご不明な点がございましたら、サポートチームまでお問い合わせください。年中無休でお手伝いいたします。",
-                support_chat: "サポートチャット", message_placeholder: "メッセージ...",
-                purchased_account_details: "購入したアカウントの詳細", login: "ログイン", password: "パスワード",
-                info: "情報"
+        document.addEventListener('DOMContentLoaded', function () {
+            const tg = window.Telegram.WebApp;
+            
+            // ==========================================================
+            // MA'LUMOTLAR BAZASI (DEMO)
+            // ==========================================================
+            const dummyAds = [
+                { id: 3673, title: 'PUBG Mythic Account', price: '80', image: 'https://via.placeholder.com/600x600/2ea6ff/17212b?text=PUBG', isAdmin: false, description: 'Juda kuchli akkaunt.', category: 'PUBG' },
+                { id: 1550, title: 'Free Fire MAX', price: '7.6', image: 'https://via.placeholder.com/600x600/e91e63/17212b?text=FF', isAdmin: true, description: 'Admin maxsus taklifi.', category: 'Free Fire' },
+                { id: 1551, title: 'CS:GO Prime', price: '15', image: 'https://via.placeholder.com/600x600/ff9800/17212b?text=CSGO', isAdmin: false, description: 'Ranki baland.', category: 'CSGO' },
+                { id: 1552, title: 'Mobile Legends Mythic', price: '50', image: 'https://via.placeholder.com/600x600/4caf50/17212b?text=MLBB', isAdmin: true, description: 'Ko\'plab skinlar bor.', category: 'Mobile Legends' },
+                { id: 1553, title: 'PUBG Glacier M416', price: '120', image: 'https://via.placeholder.com/600x600/00bcd4/17212b?text=PUBG', isAdmin: false, description: '7-levelgacha ko\'tarilgan.', category: 'PUBG' },
+                { id: 1554, title: 'Free Fire Old ID', price: '95', image: 'https://via.placeholder.com/600x600/f44336/17212b?text=FF', isAdmin: false, description: 'Eski, noyob akkaunt.', category: 'Free Fire' }
+            ];
+            const samplePurchases = [
+                { id: "p1", title: "PUBG Glacier M416", login: "user123", password: "password123", info: "70 level, M416 glacier skin."}
+            ];
+            const categories = ['All', 'PUBG', 'Free Fire', 'Mobile Legends', 'CSGO'];
+
+            // ==========================================================
+            // TIL UCHUN LUG'AT
+            // ==========================================================
+            const translations = {
+                 'uz': { home: 'Bosh sahifa', all_items: 'Barcha mahsulotlar', buy_stars_nav: 'Yulduzlar', buy_stars: 'Yulduz Sotib Olish', history: 'Tarix', profile: 'Profil', my_purchases: "Mening xaridlarim", help: "Yordam", support: "Qo'llab-quvvatlash", language: "Til", help_title: "Yordam Markazi", help_content: "Savollaringiz bo'lsa, qo'llab-quvvatlash xizmatimizga murojaat qiling.", support_chat: "Qo'llab-quvvatlash Chati", message_placeholder: "Xabar yozing...", coming_soon: "Bu bo'lim tez kunda ishga tushadi.", no_history: "Hozircha amallar mavjud emas.", login: "Login", password: "Parol", info: "Ma'lumot" },
+                 'ru': { home: 'Главная', all_items: 'Все товары', buy_stars_nav: 'Звезды', buy_stars: 'Купить Звезды', history: 'История', profile: 'Профиль', my_purchases: "Мои покупки", help: "Помощь", support: "Поддержка", language: "Язык", help_title: "Центр помощи", help_content: "Если у вас есть вопросы, обратитесь в нашу службу поддержки.", support_chat: "Чат с поддержкой", message_placeholder: "Напишите сообщение...", coming_soon: "Этот раздел скоро будет доступен.", no_history: "Пока нет транзакций.", login: "Логин", password: "Пароль", info: "Информация" },
+                 'en': { home: 'Home', all_items: 'All Items', buy_stars_nav: 'Stars', buy_stars: 'Buy Stars', history: 'History', profile: 'Profile', my_purchases: "My Purchases", help: "Help", support: "Support", language: "Language", help_title: "Help Center", help_content: "If you have any questions, please contact our support team.", support_chat: "Support Chat", message_placeholder: "Write a message...", coming_soon: "This section will be available soon.", no_history: "No transactions yet.", login: "Login", password: "Password", info: "Information" },
+                 'ja': { home: 'ホーム', all_items: 'すべての商品', buy_stars_nav: 'スター', buy_stars: 'スターを購入', history: '履歴', profile: 'プロフィール', my_purchases: "私の購入", help: "ヘルプ", support: "サポート", language: "言語", help_title: "ヘルプセンター", help_content: "ご不明な点がございましたら、サポートチームまでお問い合わせください。", support_chat: "サポートチャット", message_placeholder: "メッセージを書いてください...", coming_soon: "このセクションは間もなく利用可能になります。", no_history: "まだ取引はありません。", login: "ログイン", password: "パスワード", info: "情報" }
+            };
+            let currentLanguage = 'uz';
+
+            // ==========================================================
+            // ASOSIY FUNKSIYALAR
+            // ==========================================================
+
+            function navigateTo(pageId) {
+                document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+                const pageElement = document.getElementById(pageId);
+                if (pageElement) pageElement.classList.add('active');
+
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.toggle('active', nav.dataset.page === pageId);
+                });
+                
+                // Sub-sahifalar uchun pastki menyuni yashirish/ko'rsatish
+                const subPages = ['my-purchases-page', 'help-page', 'chat-page'];
+                document.getElementById('bottom-nav').style.display = subPages.includes(pageId) ? 'none' : 'flex';
             }
-        };
 
-        let currentLanguage = 'en'; // Boshlang'ich til
+            function renderItems(itemsToRender) {
+                const container = document.getElementById('card-container');
+                container.innerHTML = itemsToRender.map((ad, index) => `
+                    <div class="flex flex-col rounded-2xl ${ad.isAdmin ? 'bg-blue-900/40' : 'bg-tg-bg'} overflow-hidden cursor-pointer" style="animation: fade-in 0.5s ease forwards ${index * 0.1}s;">
+                        <img class="w-full h-auto aspect-square object-cover" src="${ad.image}" alt="${ad.title}">
+                        <div class="p-3">
+                            <p class="font-semibold truncate">${ad.title}</p>
+                            <p class="text-xs text-tg-hint">#${ad.id}</p>
+                            <div class="flex justify-between items-center mt-3">
+                                <div class="flex items-center gap-1.5 bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-bold py-2 px-3 rounded-lg">
+                                    <svg class="w-4 h-4" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 0L0 4.66667V14L8 9.33333L16 14V4.66667L8 0Z" fill="white"/></svg>
+                                    ${ad.price}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`).join('');
+            }
+            
+            function renderMyPurchases(purchases) {
+                const cont = document.getElementById('my-purchases-container');
+                const lang = currentLanguage;
+                cont.innerHTML = purchases.map(p => `
+                    <div class="bg-tg-secondary-bg p-4 rounded-xl">
+                        <h3 class="font-bold text-lg mb-2">${p.title}</h3>
+                        <div class="space-y-1 text-sm">
+                            <p><strong>${translations[lang].login}:</strong> ${p.login}</p>
+                            <p><strong>${translations[lang].password}:</strong> ${p.password}</p>
+                            <p><strong>${translations[lang].info}:</strong> ${p.info}</p>
+                        </div>
+                    </div>`).join('');
+            }
+            
+            function filterItems(category) {
+                document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+                const activeButton = document.querySelector(`.category-btn[data-category="${category}"]`);
+                if (activeButton) activeButton.classList.add('active');
 
-        // ==========================================================
-        // ✅ MA'LUMOTLAR (DEMO UCHUN)
-        // ==========================================================
-        const sampleItems = [
-             { id: "1001", title: "PUBG Conqueror Account", price: 150, image: "https://via.placeholder.com/300x300/2ea6ff/ffffff?text=PUBG", category: "PUBG" },
-             { id: "1002", title: "Free Fire Diamond", price: 80, image: "https://via.placeholder.com/300x300/e91e63/ffffff?text=Free+Fire", category: "Free Fire" },
-        ];
-        const sampleBanners = [ { image: "https://via.placeholder.com/600x360/2ea6ff/ffffff?text=Top+Games+Sale" }, { image: "https://via.placeholder.com/600x360/e91e63/ffffff?text=Special+Offer" }];
-        const sampleCategories = ["PUBG", "Free Fire", "Mobile Legend", "CSGO"];
-        const sampleStarPackages = [ { stars: 100, desc: "Starter pack", price: 0.99 }, { stars: 500, desc: "Popular pack", price: 4.99 }];
-        const sampleHistory = [ { item: "PUBG Conqueror", stars: 150, date: "2025-01-15" }];
-        const samplePurchases = [
-            { id: "p1", title: "PUBG Conqueror Account", login: "user123", password: "password123", info: "70 level, M416 glacier skin."}
-        ];
+                renderItems(category === 'All' ? dummyAds : dummyAds.filter(item => item.category === category));
+            }
 
-        // ==========================================================
-        // ✅ ILOVANI ISHGA TUSHIRISH
-        // ==========================================================
-        document.addEventListener('DOMContentLoaded', function() {
+            window.setLanguage = function(lang) {
+                currentLanguage = lang;
+                localStorage.setItem('appLanguage', lang); // Tanlovni saqlash
+                updateContent();
+            }
+
+            function updateContent() {
+                document.querySelectorAll('[data-translate-key]').forEach(el => {
+                    const key = el.getAttribute('data-translate-key');
+                    const translation = translations[currentLanguage]?.[key];
+                    if (translation) {
+                        if (el.tagName === 'INPUT' && el.placeholder) {
+                            el.placeholder = translation;
+                        } else {
+                            el.textContent = translation;
+                        }
+                    }
+                });
+
+                document.querySelectorAll('.lang-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.textContent.toLowerCase() === currentLanguage);
+                });
+                
+                // "Mening xaridlarim" sahifasini ham yangilash
+                renderMyPurchases(samplePurchases);
+            }
+
+            // ==========================================================
+            // ILOVANI SOZLASH (INITIALIZATION)
+            // ==========================================================
+            
+            // Telegram sozlamalari
             if (tg) {
                 tg.ready();
                 tg.expand();
-                tg.BackButton.onClick(navigationBack);
+                const user = tg.initDataUnsafe?.user;
+                if (user) {
+                    const profilePhoto = document.getElementById('profile-photo');
+                    if (user.photo_url) { profilePhoto.src = user.photo_url; }
+                    document.getElementById('profile-name').textContent = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+                }
             }
+            
+            new Swiper('.swiper', { loop: true, autoplay: { delay: 3000 } });
 
-            initializeUI();
-            initializeNavigation();
-            initializeEventListeners();
+            // Pastki navigatsiyani yaratish
+            const navItems = [
+                { id: 'home-page', key: 'home', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>' },
+                { id: 'buy-stars-page', key: 'buy_stars_nav', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>' },
+                { id: 'history-page', key: 'history', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>' },
+                { id: 'profile-page', key: 'profile', icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>' }
+            ];
+            const navContainer = document.getElementById('bottom-nav');
+            navItems.forEach(item => {
+                const navElement = document.createElement('div');
+                navElement.className = 'nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint';
+                navElement.dataset.page = item.id;
+                navElement.innerHTML = `<div class="w-6 h-6 mb-1">${item.icon}</div><span class="text-xs font-medium" data-translate-key="${item.key}">${item.key}</span>`;
+                navElement.addEventListener('click', () => navigateTo(item.id));
+                navContainer.appendChild(navElement);
+            });
 
-            // Saqlangan tilni yuklash
-            const savedLang = localStorage.getItem('appLanguage') || 'uz';
-            setLanguage(savedLang);
+            // Profil sahifasi tugmalarini sozlash
+            document.getElementById('my-purchases-btn').addEventListener('click', () => navigateTo('my-purchases-page'));
+            document.getElementById('help-btn').addEventListener('click', () => navigateTo('help-page'));
+            document.getElementById('support-btn').addEventListener('click', () => navigateTo('chat-page'));
+
+            // Filtr tugmalarini yaratish
+            const categoryContainer = document.getElementById('category-container');
+            categoryContainer.innerHTML = categories.map(cat => `<button data-category="${cat}" class="category-btn bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">${cat}</button>`).join('');
+
+            // Filtr tugmalariga bosilishini sozlash
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', () => filterItems(btn.dataset.category));
+            });
+            
+            // Boshlang'ich holat
+            const savedLanguage = localStorage.getItem('appLanguage') || 'uz';
+            setLanguage(savedLanguage);
+            renderItems(dummyAds);
+            filterItems('All');
+            navigateTo('home-page');
         });
-
-        function initializeUI() {
-            renderBanners(sampleBanners);
-            renderCategories(sampleCategories);
-            renderItems(sampleItems);
-            renderStarPackages(sampleStarPackages);
-            renderPurchaseHistory(sampleHistory);
-            renderMyPurchases(samplePurchases);
-            
-            new window.Swiper('.swiper', {
-                loop: true,
-                autoplay: { delay: 3000 },
-                pagination: { el: '.swiper-pagination', clickable: true },
-            });
-        }
-        
-        function initializeNavigation() {
-            // Pastki navigatsiya tugmalari
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', function() {
-                    const pageId = this.getAttribute('data-page');
-                    navigationStack = [{ type: 'page', id: pageId }];
-                    updateUI(navigationStack[0]);
-                });
-            });
-
-            // Profil sahifasidagi tugmalar
-            document.getElementById('my-purchases-btn').addEventListener('click', () => pushView({ type: 'page', id: 'my-purchases-page' }));
-            document.getElementById('help-btn').addEventListener('click', () => pushView({ type: 'page', id: 'help-page' }));
-            document.getElementById('support-btn').addEventListener('click', () => pushView({ type: 'page', id: 'chat-page' }));
-        }
-
-        function initializeEventListeners() {
-            // Chat
-            document.getElementById('send-btn').addEventListener('click', () => {
-                const input = document.getElementById('message-input');
-                if (input.value.trim()) {
-                    // Xabar yuborish logikasi...
-                    console.log("Sending:", input.value);
-                    input.value = '';
-                }
-            });
-             // Kategoriya filtrlari
-            document.querySelectorAll('.category-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const category = this.getAttribute('data-category');
-                    renderItems(category === 'all' ? sampleItems : sampleItems.filter(i => i.category === category));
-                    
-                    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('bg-tg-button', 'text-white'));
-                    this.classList.add('bg-tg-button', 'text-white');
-                });
-            });
-        }
-
-        // ==========================================================
-        // ✅ NAVIGATSIYA FUNKSIYALARI
-        // ==========================================================
-        function pushView(view) {
-            navigationStack.push(view);
-            updateUI(view);
-        }
-
-        function navigationBack() {
-            if (navigationStack.length > 1) {
-                navigationStack.pop();
-                updateUI(navigationStack[navigationStack.length - 1]);
-            }
-        }
-        
-        function updateUI(view) {
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            
-            const pageEl = document.getElementById(view.id);
-            if (pageEl) pageEl.classList.add('active');
-
-            const isSubPage = ['my-purchases-page', 'help-page', 'chat-page'].includes(view.id);
-            
-            document.getElementById('bottom-nav').style.display = isSubPage ? 'none' : 'flex';
-
-            if (navigationStack.length > 1) {
-                tg.BackButton.show();
-            } else {
-                tg.BackButton.hide();
-            }
-            
-            // Pastki menyu aktiv holatini yangilash
-            const mainPageId = navigationStack[0]?.id;
-            document.querySelectorAll('.nav-item').forEach(item => {
-                const isItemActive = item.getAttribute('data-page') === mainPageId;
-                item.classList.toggle('active', isItemActive);
-                item.classList.toggle('text-tg-hint', !isItemActive);
-            });
-        }
-
-        // ==========================================================
-        // ✅ TILNI BOSHQARISH FUNKSIYALARI
-        // ==========================================================
-        function setLanguage(lang) {
-            currentLanguage = lang;
-            localStorage.setItem('appLanguage', lang); // Tanlovni saqlash
-            updateContent();
-        }
-
-        function updateContent() {
-            document.querySelectorAll('[data-translate-key]').forEach(el => {
-                const key = el.getAttribute('data-translate-key');
-                if (translations[currentLanguage] && translations[currentLanguage][key]) {
-                    if (el.tagName === 'INPUT' && el.placeholder) {
-                        el.placeholder = translations[currentLanguage][key];
-                    } else {
-                        el.textContent = translations[currentLanguage][key];
-                    }
-                }
-            });
-
-            // Til tugmalarining aktiv holatini yangilash
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.textContent.toLowerCase() === currentLanguage);
-            });
-        }
-
-        // ==========================================================
-        // ✅ RENDER (MA'LUMOTLARNI CHIZISH) FUNKSIYALARI
-        // ==========================================================
-        function renderItems(items) {
-            const container = document.getElementById('items-container');
-            container.innerHTML = items.map(item => `
-                <div class="flex flex-col rounded-2xl bg-tg-secondary-bg overflow-hidden cursor-pointer">
-                    <img class="w-full h-auto aspect-square object-cover" src="${item.image}" alt="${item.title}">
-                    <div class="p-3">
-                        <p class="font-semibold truncate">${item.title}</p>
-                        <p class="text-xs text-tg-hint">#${item.id}</p>
-                        <div class="flex justify-between items-center mt-3">
-                            <div class="flex items-center gap-1.5 bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-bold py-2 px-3 rounded-lg">${item.price} Stars</div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderBanners(banners) {
-            const cont = document.getElementById('banner-container');
-            cont.innerHTML = banners.map(b => `<div class="swiper-slide"><img src="${b.image}" class="w-full h-full object-cover rounded-lg"></div>`).join('');
-        }
-        function renderCategories(categories) {
-            const cont = document.getElementById('category-filters');
-            cont.innerHTML = `<button data-category="all" class="category-btn active bg-tg-button text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">All</button>` + 
-            categories.map(c => `<button data-category="${c}" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">${c}</button>`).join('');
-        }
-         function renderStarPackages(packages) {
-            const cont = document.getElementById('star-packages');
-            cont.innerHTML = packages.map(p => `<div class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center"><div><h3 class="font-bold">${p.stars} Stars</h3><p class="text-tg-hint text-sm">${p.desc}</p></div><button class="bg-tg-button text-white px-4 py-2 rounded-lg">$${p.price}</button></div>`).join('');
-        }
-        function renderPurchaseHistory(history) {
-            const cont = document.getElementById('purchase-history-container');
-            cont.innerHTML = history.map(h => `<div class="bg-tg-secondary-bg p-4 rounded-xl"><p class="font-semibold">${h.item}</p><p class="text-tg-hint text-sm">${h.stars} Stars • Completed</p><p class="text-tg-hint text-xs">${h.date}</p></div>`).join('');
-        }
-        function renderMyPurchases(purchases) {
-            const cont = document.getElementById('my-purchases-container');
-            const lang = currentLanguage;
-            cont.innerHTML = purchases.map(p => `
-                <div class="bg-tg-secondary-bg p-4 rounded-xl">
-                    <h3 class="font-bold text-lg mb-2">${p.title}</h3>
-                    <div class="space-y-1 text-sm">
-                        <p><strong data-translate-key="login">${translations[lang].login || 'Login'}:</strong> ${p.login}</p>
-                        <p><strong data-translate-key="password">${translations[lang].password || 'Password'}:</strong> ${p.password}</p>
-                        <p><strong data-translate-key="info">${translations[lang].info || 'Info'}:</strong> ${p.info}</p>
-                    </div>
-                </div>
-            `).join('');
-        }
-
     </script>
 </body>
 </html>
