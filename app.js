@@ -87,65 +87,67 @@ const dummyAds = [
   },
 ]
 
-// UI Update function
-function updateUI(view) {
-  document.querySelectorAll(".page, #item-modal").forEach((el) => el.classList.add("hidden"))
-  document.querySelectorAll("#profile-main, #help-subpage").forEach((el) => el.classList.add("hidden"))
-  const bottomNav = document.getElementById("bottom-nav")
+// Page navigation function - GLOBAL FUNCTION
+function showPage(pageId) {
+  console.log("Showing page:", pageId)
 
-  if (view.type === "page") {
-    const pageEl = document.getElementById(view.id)
-    pageEl.classList.remove("hidden")
-    if (view.id === "profile-page") {
-      pageEl.querySelector("#profile-main").classList.remove("hidden")
-    }
-    bottomNav.classList.remove("hidden")
-  } else if (view.type === "modal") {
-    const modalEl = document.getElementById(view.id)
-    modalEl.classList.remove("hidden")
-    setTimeout(() => modalEl.classList.add("opacity-100"), 10)
-    bottomNav.classList.add("hidden")
-  } else if (view.type === "subpage") {
-    const parentPage = document.getElementById("profile-page")
-    parentPage.classList.remove("hidden")
-    document.getElementById(view.id).classList.remove("hidden")
-    bottomNav.classList.add("hidden")
-  } else if (view.type === "chat") {
-    // Chat sahifasi uchun maxsus qoida - bottom nav yashiriladi
-    const pageEl = document.getElementById(view.id)
-    pageEl.classList.remove("hidden")
-    bottomNav.classList.add("hidden")
-  }
+  // Hide all pages
+  document.querySelectorAll(".page").forEach((page) => {
+    page.classList.remove("active")
+  })
 
-  if (navigationStack.length > 1) {
-    tg.BackButton.show()
+  // Show selected page
+  const targetPage = document.getElementById(pageId)
+  if (targetPage) {
+    targetPage.classList.add("active")
+    console.log("Page activated:", pageId)
   } else {
-    tg.BackButton.hide()
+    console.error("Page not found:", pageId)
+  }
+
+  // Update navigation active state
+  document.querySelectorAll(".nav-item").forEach((item) => {
+    item.classList.remove("active")
+    item.classList.add("text-tg-hint")
+  })
+
+  // Find and activate current nav item
+  const currentNavItem = document.querySelector(`[data-page="${pageId}"]`)
+  if (currentNavItem) {
+    currentNavItem.classList.add("active")
+    currentNavItem.classList.remove("text-tg-hint")
+    console.log("Nav item activated for:", pageId)
   }
 }
 
-// Navigation functions
-function navigateTo(view) {
-  navigationStack.push(view)
-  updateUI(view)
-}
+// Filter function - GLOBAL FUNCTION
+function filterItems(category) {
+  console.log("Filtering by category:", category)
 
-function handleBackPress() {
-  if (navigationStack.length > 1) {
-    const currentView = navigationStack.pop()
-    if (currentView.type === "modal") {
-      const modal = document.getElementById(currentView.id)
-      modal.classList.remove("opacity-100")
-      setTimeout(() => {
-        modal.classList.add("hidden")
-      }, 300)
-    }
-    const previousView = navigationStack[navigationStack.length - 1]
-    updateUI(previousView)
+  // Update button styles
+  document.querySelectorAll(".category-btn").forEach((btn) => {
+    btn.classList.remove("bg-tg-button", "text-white", "active")
+    btn.classList.add("bg-tg-secondary-bg", "text-tg-text")
+  })
+
+  // Find and activate the correct button
+  const activeButton = document.querySelector(`[data-category="${category}"]`)
+  if (activeButton) {
+    activeButton.classList.remove("bg-tg-secondary-bg", "text-tg-text")
+    activeButton.classList.add("bg-tg-button", "text-white", "active")
   }
+
+  // Filter items
+  let itemsToShow = currentItems
+  if (category !== "all") {
+    itemsToShow = currentItems.filter((item) => item.category === category)
+  }
+
+  filteredItems = itemsToShow
+  renderItems(itemsToShow)
 }
 
-// Modal functions
+// Open modal function - GLOBAL FUNCTION
 function openModal(adId) {
   const ad = currentItems.find((item) => item.id === adId)
   if (!ad) return
@@ -176,45 +178,79 @@ function openModal(adId) {
                 }
             </footer>
         </div>`
-  navigateTo({ type: "modal", id: "item-modal" })
+
+  modal.classList.remove("hidden")
+  setTimeout(() => modal.classList.add("opacity-100"), 10)
+
+  // Hide bottom nav
+  document.getElementById("bottom-nav").classList.add("hidden")
+
+  // Show back button
+  tg.BackButton.show()
 }
 
-// Filter functions
-function initializeCategoryFilters() {
-  const categoryButtons = document.querySelectorAll(".category-btn")
+// Close modal function - GLOBAL FUNCTION
+function closeModal() {
+  const modal = document.getElementById("item-modal")
+  modal.classList.remove("opacity-100")
+  setTimeout(() => {
+    modal.classList.add("hidden")
+  }, 300)
 
-  categoryButtons.forEach((button) => {
-    button.addEventListener("click", function () {
-      const category = this.getAttribute("data-category")
-      filterItems(category)
-    })
-  })
+  // Show bottom nav
+  document.getElementById("bottom-nav").classList.remove("hidden")
+
+  // Hide back button
+  tg.BackButton.hide()
 }
 
-function filterItems(category) {
-  console.log("Filtering by category:", category)
+// Navigate to function - GLOBAL FUNCTION
+function navigateTo(view) {
+  navigationStack.push(view)
+  updateUI(view)
+}
 
-  // Update button styles
-  document.querySelectorAll(".category-btn").forEach((btn) => {
-    btn.classList.remove("bg-tg-button", "text-white", "active")
-    btn.classList.add("bg-tg-secondary-bg", "text-tg-text")
-  })
+// UI Update function
+function updateUI(view) {
+  document.querySelectorAll(".page, #item-modal").forEach((el) => el.classList.remove("active"))
+  document.querySelectorAll("#profile-main, #help-subpage").forEach((el) => el.classList.add("hidden"))
+  const bottomNav = document.getElementById("bottom-nav")
 
-  // Find and activate the correct button
-  const activeButton = document.querySelector(`[data-category="${category}"]`)
-  if (activeButton) {
-    activeButton.classList.remove("bg-tg-secondary-bg", "text-tg-text")
-    activeButton.classList.add("bg-tg-button", "text-white", "active")
+  if (view.type === "page") {
+    showPage(view.id)
+    bottomNav.classList.remove("hidden")
+  } else if (view.type === "modal") {
+    const modalEl = document.getElementById(view.id)
+    modalEl.classList.remove("hidden")
+    setTimeout(() => modalEl.classList.add("opacity-100"), 10)
+    bottomNav.classList.add("hidden")
+  } else if (view.type === "subpage") {
+    const parentPage = document.getElementById("profile-page")
+    parentPage.classList.add("active")
+    document.getElementById("profile-main").classList.add("hidden")
+    document.getElementById(view.id).classList.remove("hidden")
+    bottomNav.classList.add("hidden")
+  } else if (view.type === "chat") {
+    showPage(view.id)
+    bottomNav.classList.add("hidden")
   }
 
-  // Filter items
-  let itemsToShow = currentItems
-  if (category !== "all") {
-    itemsToShow = currentItems.filter((item) => item.category === category)
+  if (navigationStack.length > 1) {
+    tg.BackButton.show()
+  } else {
+    tg.BackButton.hide()
   }
+}
 
-  filteredItems = itemsToShow
-  renderItems(itemsToShow)
+function handleBackPress() {
+  if (navigationStack.length > 1) {
+    const currentView = navigationStack.pop()
+    if (currentView.type === "modal") {
+      closeModal()
+    }
+    const previousView = navigationStack[navigationStack.length - 1]
+    updateUI(previousView)
+  }
 }
 
 // Render functions
@@ -250,7 +286,7 @@ function renderItems(items) {
     .join("")
 }
 
-// Chat functions
+// Chat functions - GLOBAL FUNCTIONS
 function sendMessage() {
   const input = document.getElementById("message-input")
   const message = input.value.trim()
@@ -263,6 +299,10 @@ function sendMessage() {
   setTimeout(() => {
     addMessage("Rahmat! Sizning xabaringiz qabul qilindi. Tez orada javob beramiz.", "received")
   }, 1000)
+}
+
+function selectImage() {
+  document.getElementById("image-input").click()
 }
 
 function addMessage(text, type, imageUrl = null) {
@@ -282,10 +322,6 @@ function addMessage(text, type, imageUrl = null) {
   messageDiv.innerHTML = content
   messagesContainer.appendChild(messageDiv)
   messagesContainer.scrollTop = messagesContainer.scrollHeight
-}
-
-function selectImage() {
-  document.getElementById("image-input").click()
 }
 
 // Initialize navigation
@@ -318,15 +354,13 @@ function initializeNavigation() {
 
   navItems.forEach((item, index) => {
     const navElement = document.createElement("div")
-    navElement.className = "nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint"
-    navElement.innerHTML = `<div class="w-6 h-6">${item.icon}</div><span class="text-xs font-medium">${item.label}</span>`
+    navElement.className =
+      "nav-item flex-1 flex flex-col items-center justify-center cursor-pointer text-tg-hint transition-colors duration-200 py-2"
+    navElement.setAttribute("data-page", item.id)
+    navElement.innerHTML = `<div class="w-6 h-6 mb-1">${item.icon}</div><span class="text-xs font-medium">${item.label}</span>`
 
     navElement.addEventListener("click", () => {
-      navigationStack.length = 0
-      navigateTo({ type: "page", id: item.id })
-
-      document.querySelectorAll("#bottom-nav .nav-item").forEach((i) => i.classList.remove("active"))
-      navElement.classList.add("active")
+      showPage(item.id)
     })
     navContainer.appendChild(navElement)
 
@@ -336,6 +370,72 @@ function initializeNavigation() {
       navElement.classList.remove("text-tg-hint")
     }
   })
+
+  console.log("Navigation initialized successfully")
+}
+
+// Initialize category filters
+function initializeCategoryFilters() {
+  const categoryButtons = document.querySelectorAll(".category-btn")
+
+  categoryButtons.forEach((button) => {
+    button.addEventListener("click", function () {
+      const category = this.getAttribute("data-category")
+      filterItems(category)
+    })
+  })
+
+  console.log("Category filters initialized successfully")
+}
+
+// Initialize profile menu
+function initializeProfileMenu() {
+  const menuItems = document.querySelectorAll(".profile-menu-item")
+
+  menuItems.forEach((item) => {
+    item.addEventListener("click", function () {
+      const action = this.getAttribute("data-action")
+
+      switch (action) {
+        case "my-purchases":
+          navigateTo({ type: "page", id: "my-purchases-page" })
+          break
+        case "help":
+          navigateTo({ type: "subpage", id: "help-subpage" })
+          break
+        case "support":
+          navigateTo({ type: "chat", id: "chat-page" })
+          break
+      }
+    })
+  })
+
+  console.log("Profile menu initialized successfully")
+}
+
+// Initialize chat
+function initializeChat() {
+  const sendBtn = document.getElementById("send-message-btn")
+  const selectImageBtn = document.getElementById("select-image-btn")
+  const messageInput = document.getElementById("message-input")
+
+  if (sendBtn) {
+    sendBtn.addEventListener("click", sendMessage)
+  }
+
+  if (selectImageBtn) {
+    selectImageBtn.addEventListener("click", selectImage)
+  }
+
+  if (messageInput) {
+    messageInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        sendMessage()
+      }
+    })
+  }
+
+  console.log("Chat initialized successfully")
 }
 
 // Event listeners
@@ -356,7 +456,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (user.photo_url) {
       profilePhoto.src = user.photo_url
     } else {
-      profilePhoto.classList.add("hidden")
+      profilePhoto.src = "/placeholder.svg?height=96&width=96"
     }
     document.getElementById("profile-name").textContent = user.first_name + (user.last_name ? " " + user.last_name : "")
   }
@@ -366,14 +466,27 @@ document.addEventListener("DOMContentLoaded", () => {
   filteredItems = dummyAds
   renderItems(dummyAds)
 
-  // Initialize navigation and filters
+  // Initialize Swiper
+  if (window.Swiper) {
+    setTimeout(() => {
+      new window.Swiper(".swiper", {
+        loop: true,
+        autoplay: {
+          delay: 3000,
+          disableOnInteraction: false,
+        },
+        effect: "slide",
+        speed: 500,
+      })
+      console.log("Swiper initialized successfully")
+    }, 500)
+  }
+
+  // Initialize all components
   initializeNavigation()
   initializeCategoryFilters()
-
-  // Boshlang'ich sahifani o'rnatish
-  if (navigationStack.length === 0) {
-    navigateTo({ type: "page", id: "home-page" })
-  }
+  initializeProfileMenu()
+  initializeChat()
 
   console.log("App initialized successfully")
 })
@@ -396,15 +509,5 @@ document.addEventListener("change", (e) => {
     }
   }
 })
-
-// Handle Enter key in message input
-document.addEventListener("keypress", (e) => {
-  if (e.target.id === "message-input" && e.key === "Enter") {
-    sendMessage()
-  }
-})
-
-// Import Swiper
-const Swiper = window.Swiper
 
 console.log("App.js loaded successfully!")
