@@ -7,6 +7,86 @@ let currentItems = []
 let currentCategories = []
 const Swiper = window.Swiper // Declare Swiper variable
 
+// Declare functions before using them
+function navigateTo(page) {
+  // Implementation for navigating to a page
+  console.log("Navigating to:", page)
+}
+
+function handleBackPress() {
+  // Implementation for handling back button press
+  console.log("Back button clicked")
+}
+
+async function loadCategories() {
+  try {
+    const categories = await apiCall("/categories")
+    currentCategories = categories
+    renderCategories(categories)
+  } catch (error) {
+    console.error("Error loading categories:", error)
+  }
+}
+
+function renderBanners(banners) {
+  const container = document.getElementById("banner-container")
+  container.innerHTML = banners
+    .map(
+      (banner) => `
+        <div class="banner">
+            <img src="${banner.image_url}" alt="${banner.title}">
+            <h2>${banner.title}</h2>
+        </div>
+    `,
+    )
+    .join("")
+}
+
+function renderStarPackages(packages) {
+  const container = document.getElementById("star-packages-container")
+  container.innerHTML = packages
+    .map(
+      (pkg) => `
+        <div class="star-package">
+            <p>${pkg.description}</p>
+            <p>Price: $${pkg.price}</p>
+            <button onclick="buyStars('${pkg._id}')">Buy</button>
+        </div>
+    `,
+    )
+    .join("")
+}
+
+function renderPurchaseHistory(history) {
+  const container = document.getElementById("purchase-history-container")
+  container.innerHTML = history
+    .map(
+      (purchase) => `
+        <div class="purchase">
+            <p>${purchase.item_title}</p>
+            <p>Stars: ${purchase.stars}</p>
+            <p>Date: ${new Date(purchase.created_at).toLocaleDateString()}</p>
+        </div>
+    `,
+    )
+    .join("")
+}
+
+function renderMyPurchases(purchases) {
+  const container = document.getElementById("my-purchases-container")
+  container.innerHTML = purchases
+    .map(
+      (purchase) => `
+        <div class="purchase">
+            <p>${purchase.item_title}</p>
+            <p>Stars: ${purchase.stars}</p>
+            <p>Date: ${new Date(purchase.created_at).toLocaleDateString()}</p>
+        </div>
+    `,
+    )
+    .join("")
+}
+
 // Initialize app
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM Content Loaded")
@@ -57,7 +137,7 @@ function initializeNavigation() {
     {
       id: "history-page",
       label: "History",
-      icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>',
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>',
     },
     {
       id: "profile-page",
@@ -201,14 +281,18 @@ async function loadItems(category = null) {
   }
 }
 
-async function loadCategories() {
-  try {
-    const categories = await apiCall("/categories")
-    currentCategories = categories
-    renderCategories(categories)
-  } catch (error) {
-    console.error("Error loading categories:", error)
-  }
+function renderCategories(categories) {
+  const container = document.getElementById("category-filters")
+  container.innerHTML = `
+        <button onclick="filterByCategory(null)" class="category-btn bg-tg-button text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">All</button>
+        ${categories
+          .map(
+            (cat) => `
+            <button onclick="filterByCategory('${cat.name}')" class="category-btn bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">${cat.name}</button>
+        `,
+          )
+          .join("")}
+    `
 }
 
 async function loadBanners() {
@@ -278,265 +362,6 @@ function renderItems(items) {
     .join("")
 }
 
-function renderCategories(categories) {
-  const container = document.getElementById("category-filters")
-  container.innerHTML = `
-        <button onclick="filterByCategory(null)" class="category-btn bg-tg-button text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">All</button>
-        ${categories
-          .map(
-            (cat) => `
-            <button onclick="filterByCategory('${cat._id}')" class="category-btn bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">${cat.name}</button>
-        `,
-          )
-          .join("")}
-    `
-}
-
-function renderBanners(banners) {
-  const container = document.getElementById("banner-container")
-  container.innerHTML = banners
-    .map(
-      (banner) => `
-        <div class="swiper-slide">
-            <img src="${banner.image_url || "/placeholder.svg?height=360&width=600"}" class="w-full h-full object-cover">
-        </div>
-    `,
-    )
-    .join("")
-
-  // Initialize Swiper
-  if (Swiper) {
-    new Swiper(".swiper", {
-      loop: true,
-      autoplay: { delay: 3000 },
-      pagination: {
-        el: ".swiper-pagination",
-      },
-    })
-  } else {
-    console.error("Swiper is not defined")
-  }
-}
-
-function renderStarPackages(packages) {
-  const container = document.getElementById("star-packages")
-  container.innerHTML = packages
-    .map(
-      (pkg) => `
-        <div class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center">
-            <div>
-                <h3 class="font-bold">${pkg.stars} Stars</h3>
-                <p class="text-tg-hint text-sm">${pkg.description}</p>
-            </div>
-            <button onclick="buyStars('${pkg._id}')" class="bg-tg-button text-white px-4 py-2 rounded-lg">
-                $${pkg.price}
-            </button>
-        </div>
-    `,
-    )
-    .join("")
-}
-
-function renderPurchaseHistory(history) {
-  const container = document.getElementById("history-container")
-  if (history.length === 0) {
-    container.innerHTML = '<p class="text-tg-hint text-center">No purchase history yet.</p>'
-    return
-  }
-
-  container.innerHTML = history
-    .map(
-      (purchase) => `
-        <div class="bg-tg-secondary-bg p-4 rounded-xl mb-3">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h3 class="font-bold">${purchase.item.title}</h3>
-                    <p class="text-tg-hint text-sm">${new Date(purchase.created_at).toLocaleDateString()}</p>
-                </div>
-                <div class="text-right">
-                    <p class="font-bold">${purchase.price} Stars</p>
-                    <p class="text-xs ${purchase.status === "completed" ? "text-green-400" : "text-yellow-400"}">${purchase.status}</p>
-                </div>
-            </div>
-        </div>
-    `,
-    )
-    .join("")
-}
-
-function renderMyPurchases(purchases) {
-  const container = document.getElementById("purchases-container")
-  if (purchases.length === 0) {
-    container.innerHTML = '<p class="text-tg-hint text-center">No purchases yet.</p>'
-    return
-  }
-
-  container.innerHTML = purchases
-    .map(
-      (purchase) => `
-        <div class="bg-tg-secondary-bg p-4 rounded-xl mb-3">
-            <h3 class="font-bold mb-2">${purchase.item.title}</h3>
-            <div class="space-y-1 text-sm">
-                <p><span class="text-tg-hint">Login:</span> ${purchase.credentials.login}</p>
-                <p><span class="text-tg-hint">Password:</span> ${purchase.credentials.password}</p>
-                <p><span class="text-tg-hint">Purchase Date:</span> ${new Date(purchase.created_at).toLocaleDateString()}</p>
-            </div>
-        </div>
-    `,
-    )
-    .join("")
-}
-
-// Navigation Functions
-function updateUI(view) {
-  document.querySelectorAll(".page, #item-modal").forEach((el) => el.classList.add("hidden"))
-  document.querySelectorAll("#profile-main, #help-subpage").forEach((el) => el.classList.add("hidden"))
-
-  const bottomNav = document.getElementById("bottom-nav")
-
-  if (view.type === "page") {
-    const pageEl = document.getElementById(view.id)
-    pageEl.classList.remove("hidden")
-    if (view.id === "profile-page") {
-      pageEl.querySelector("#profile-main").classList.remove("hidden")
-    }
-    if (view.id === "history-page") {
-      loadPurchaseHistory()
-    }
-    if (view.id === "my-purchases-page") {
-      loadMyPurchases()
-    }
-    bottomNav.classList.remove("hidden")
-  } else if (view.type === "modal") {
-    const modalEl = document.getElementById(view.id)
-    modalEl.classList.remove("hidden")
-    setTimeout(() => modalEl.classList.add("opacity-100"), 10)
-    bottomNav.classList.add("hidden")
-  } else if (view.type === "subpage") {
-    const parentPage = document.getElementById("profile-page")
-    parentPage.classList.remove("hidden")
-    document.getElementById(view.id).classList.remove("hidden")
-    bottomNav.classList.add("hidden")
-  }
-
-  if (navigationStack.length > 1) {
-    tg.BackButton.show()
-  } else {
-    tg.BackButton.hide()
-  }
-}
-
-function navigateTo(view) {
-  navigationStack.push(view)
-  updateUI(view)
-}
-
-function handleBackPress() {
-  if (navigationStack.length > 1) {
-    const currentView = navigationStack.pop()
-    if (currentView.type === "modal") {
-      const modal = document.getElementById(currentView.id)
-      modal.classList.remove("opacity-100")
-      setTimeout(() => {
-        modal.classList.add("hidden")
-      }, 300)
-    }
-    const previousView = navigationStack[navigationStack.length - 1]
-    updateUI(previousView)
-  }
-}
-
-// Item Functions
-async function openModal(itemId) {
-  try {
-    const item = currentItems.find((i) => i._id === itemId)
-    if (!item) return
-
-    const modal = document.getElementById("item-modal")
-    modal.innerHTML = `
-            <div class="h-full w-full flex flex-col">
-                <div class="flex-grow overflow-y-auto">
-                    <img src="${item.image_url || "/placeholder.svg?height=400&width=400"}" class="w-full aspect-square object-cover">
-                    <div class="p-4">
-                        <h2 class="text-3xl font-bold mb-2">${item.title}</h2>
-                        <p class="text-lg text-tg-hint mb-4">#${item.item_id}</p>
-                        <p class="text-base leading-relaxed mb-4">${item.description}</p>
-                        <div class="bg-tg-secondary-bg p-3 rounded-lg">
-                            <p class="text-sm text-tg-hint mb-1">Category</p>
-                            <p class="font-medium">${item.category?.name || "General"}</p>
-                        </div>
-                    </div>
-                </div>
-                <footer class="flex-shrink-0 p-4 border-t border-gray-700/50 bg-tg-bg">
-                    ${
-                      item.is_admin_item
-                        ? `<button onclick="showPurchaseModal('${item._id}', 'admin')" class="w-full bg-tg-button text-white font-bold py-4 rounded-xl">Buy via Admin (${item.price} Stars)</button>`
-                        : `<div class="flex gap-3">
-                            <button onclick="showPurchaseModal('${item._id}', 'direct')" class="flex-1 bg-white/10 text-tg-text font-bold py-4 rounded-xl">Direct Purchase</button>
-                            <button onclick="showPurchaseModal('${item._id}', 'admin')" class="flex-1 bg-tg-button text-white font-bold py-4 rounded-xl">Via Admin</button>
-                        </div>`
-                    }
-                </footer>
-            </div>`
-    navigateTo({ type: "modal", id: "item-modal" })
-  } catch (error) {
-    console.error("Error opening modal:", error)
-    showError("Failed to load item details")
-  }
-}
-
-function showPurchaseModal(itemId, type) {
-  const item = currentItems.find((i) => i._id === itemId)
-  if (!item) return
-
-  const modal = document.getElementById("purchase-modal")
-  const details = document.getElementById("purchase-details")
-
-  details.innerHTML = `
-        <div class="text-center">
-            <h4 class="font-bold mb-2">${item.title}</h4>
-            <p class="text-2xl font-bold text-tg-link mb-2">${item.price} Stars</p>
-            <p class="text-sm text-tg-hint">Purchase Type: ${type === "admin" ? "Via Admin" : "Direct"}</p>
-        </div>
-    `
-
-  modal.classList.remove("hidden")
-  modal.dataset.itemId = itemId
-  modal.dataset.purchaseType = type
-}
-
-function closePurchaseModal() {
-  document.getElementById("purchase-modal").classList.add("hidden")
-}
-
-async function confirmPurchase() {
-  const modal = document.getElementById("purchase-modal")
-  const itemId = modal.dataset.itemId
-  const purchaseType = modal.dataset.purchaseType
-
-  try {
-    const result = await apiCall("/purchases/create", {
-      method: "POST",
-      body: JSON.stringify({
-        item_id: itemId,
-        purchase_type: purchaseType,
-      }),
-    })
-
-    closePurchaseModal()
-    showSuccess("Purchase successful!")
-
-    // Update user balance
-    if (currentUser) {
-      currentUser.balance = result.new_balance
-      updateProfileUI(currentUser)
-    }
-  } catch (error) {
-    console.error("Purchase failed:", error)
-    showError("Purchase failed. Please try again.")
-  }
-}
-
 // Filter Functions
 function filterByCategory(categoryId) {
   // Update button styles
@@ -545,11 +370,23 @@ function filterByCategory(categoryId) {
     btn.classList.add("bg-tg-secondary-bg")
   })
 
-  event.target.classList.remove("bg-tg-secondary-bg")
-  event.target.classList.add("bg-tg-button", "text-white")
+  // Find the clicked button and update its style
+  const clickedButton =
+    document.querySelector(`[onclick="filterByCategory('${categoryId}')"]`) ||
+    document.querySelector(`[onclick="filterByCategory(null)"]`)
+
+  if (clickedButton) {
+    clickedButton.classList.remove("bg-tg-secondary-bg")
+    clickedButton.classList.add("bg-tg-button", "text-white")
+  }
 
   // Filter items
-  loadItems(categoryId)
+  if (categoryId) {
+    const filteredItems = currentItems.filter((item) => item.category && item.category.name === categoryId)
+    renderItems(filteredItems)
+  } else {
+    renderItems(currentItems)
+  }
 }
 
 // Chat Functions
@@ -704,7 +541,7 @@ function loadSampleData() {
       title: "PUBG Conqueror Account",
       description: "High-tier PUBG Mobile account with Conqueror rank, rare skins, and premium items.",
       price: 150,
-      image_url: "/placeholder.svg?height=300&width=300&text=PUBG+Conqueror",
+      image_url: "https://via.placeholder.com/300x300/2ea6ff/ffffff?text=PUBG+Conqueror",
       is_admin_item: true,
       category: { name: "PUBG" },
     },
@@ -714,7 +551,7 @@ function loadSampleData() {
       title: "Free Fire Diamond Account",
       description: "Free Fire account with 50,000+ diamonds and exclusive characters.",
       price: 80,
-      image_url: "/placeholder.svg?height=300&width=300&text=Free+Fire+Diamond",
+      image_url: "https://via.placeholder.com/300x300/e91e63/ffffff?text=Free+Fire+Diamond",
       is_admin_item: false,
       category: { name: "Free Fire" },
     },
@@ -724,7 +561,7 @@ function loadSampleData() {
       title: "PUBG UC Account",
       description: "PUBG Mobile account with 8100 UC and premium battle pass.",
       price: 120,
-      image_url: "/placeholder.svg?height=300&width=300&text=PUBG+UC",
+      image_url: "https://via.placeholder.com/300x300/4caf50/ffffff?text=PUBG+UC",
       is_admin_item: true,
       category: { name: "PUBG" },
     },
@@ -734,9 +571,29 @@ function loadSampleData() {
       title: "Free Fire Elite Pass",
       description: "Free Fire account with Elite Pass and rare bundles.",
       price: 45,
-      image_url: "/placeholder.svg?height=300&width=300&text=FF+Elite",
+      image_url: "https://via.placeholder.com/300x300/ff9800/ffffff?text=FF+Elite",
       is_admin_item: false,
       category: { name: "Free Fire" },
+    },
+    {
+      _id: "1005",
+      item_id: "1005",
+      title: "Call of Duty Legendary",
+      description: "COD Mobile account with legendary weapons and skins.",
+      price: 200,
+      image_url: "https://via.placeholder.com/300x300/9c27b0/ffffff?text=COD+Legendary",
+      is_admin_item: true,
+      category: { name: "Call of Duty" },
+    },
+    {
+      _id: "1006",
+      item_id: "1006",
+      title: "Clash of Clans Max",
+      description: "Maxed out Clash of Clans account with all troops and buildings.",
+      price: 300,
+      image_url: "https://via.placeholder.com/300x300/f44336/ffffff?text=COC+Max",
+      is_admin_item: false,
+      category: { name: "Clash of Clans" },
     },
   ]
 
@@ -745,12 +602,12 @@ function loadSampleData() {
     {
       _id: "b1",
       title: "Top Games Sale",
-      image_url: "/placeholder.svg?height=360&width=600&text=Top+Games+Sale",
+      image_url: "https://via.placeholder.com/600x360/2ea6ff/ffffff?text=Top+Games+Sale",
     },
     {
       _id: "b2",
       title: "Special Offer",
-      image_url: "/placeholder.svg?height=360&width=600&text=Special+Offer",
+      image_url: "https://via.placeholder.com/600x360/e91e63/ffffff?text=Special+Offer",
     },
   ]
 
