@@ -7,6 +7,8 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -96,8 +98,11 @@
             <!-- Home Page -->
             <div id="home-page" class="page active">
                 <!-- Banner Section -->
-                <div class="h-48 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
-                    <h1 class="text-2xl font-bold text-white">Game Market</h1>
+                <div class="swiper h-48">
+                    <div class="swiper-wrapper" id="banner-container">
+                        <!-- Banners will be loaded here -->
+                    </div>
+                    <div class="swiper-pagination"></div>
                 </div>
                 
                 <!-- Categories -->
@@ -106,7 +111,8 @@
                         <button onclick="filterItems('all')" class="category-btn active bg-tg-button text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">All</button>
                         <button onclick="filterItems('PUBG')" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">PUBG</button>
                         <button onclick="filterItems('Free Fire')" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Free Fire</button>
-                        <button onclick="filterItems('Call of Duty')" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Call of Duty</button>
+                        <button onclick="filterItems('Mobile Legend')" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">Mobile Legend</button>
+                        <button onclick="filterItems('CSGO')" class="category-btn bg-tg-secondary-bg text-tg-text px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">CSGO</button>
                     </div>
                 </div>
                 
