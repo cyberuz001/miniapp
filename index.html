@@ -61,13 +61,65 @@
             border-radius: 8px;
             margin-top: 4px;
         }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Simple layout */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #app {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+
+        #bottom-nav {
+            height: 64px;
+            flex-shrink: 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
     </style>
 </head>
-<body class="bg-tg-bg text-tg-text font-sans antialiased overflow-hidden">
+<body class="bg-tg-bg text-tg-text font-sans antialiased">
 
-    <div id="app" class="h-screen w-screen flex flex-col">
-        <main class="flex-grow overflow-y-auto">
-            <div id="home-page" class="page">
+    <div id="app">
+        <main>
+            <div id="home-page" class="page active">
                 <div class="swiper h-48">
                     <div class="swiper-wrapper">
                         <div class="swiper-slide"><img src="https://via.placeholder.com/600x360/2ea6ff/ffffff?text=Top+O'yinlar" class="w-full h-full object-cover"></div>
@@ -90,24 +142,28 @@
                 <div id="card-container" class="px-4 pb-4 grid grid-cols-2 gap-4"></div>
             </div>
 
-            <div id="buy-stars-page" class="page hidden p-4 text-center">
-                <h2 class="text-xl font-bold mt-10">Buy Stars</h2>
-                <p class="text-tg-hint mt-2">Bu bo'lim tez kunda ishga tushadi.</p>
+            <div id="buy-stars-page" class="page">
+                <div class="p-4 text-center">
+                    <h2 class="text-xl font-bold mt-10">Buy Stars</h2>
+                    <p class="text-tg-hint mt-2">Bu bo'lim tez kunda ishga tushadi.</p>
+                </div>
             </div>
             
-            <div id="history-page" class="page hidden p-4 text-center">
-                <h2 class="text-xl font-bold mt-10">History</h2>
-                <p class="text-tg-hint mt-4 text-center">Hozircha amallar mavjud emas.</p>
+            <div id="history-page" class="page">
+                <div class="p-4 text-center">
+                    <h2 class="text-xl font-bold mt-10">History</h2>
+                    <p class="text-tg-hint mt-4 text-center">Hozircha amallar mavjud emas.</p>
+                </div>
             </div>
 
-            <div id="profile-page" class="page hidden">
+            <div id="profile-page" class="page">
                 <div id="profile-main">
                     <div class="flex flex-col items-center p-6">
-                        <img id="profile-photo" class="w-24 h-24 rounded-full border-2 border-tg-link">
-                        <h2 id="profile-name" class="text-2xl font-bold mt-4"></h2>
+                        <img id="profile-photo" class="w-24 h-24 rounded-full border-2 border-tg-link" src="/placeholder.svg?height=96&width=96">
+                        <h2 id="profile-name" class="text-2xl font-bold mt-4">User Name</h2>
                     </div>
                     <div class="px-4 flex flex-col gap-3">
-                        <div onclick="navigateTo({type: 'page', id: 'my-purchases-page'})" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]">
+                        <div class="profile-menu-item bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]" data-action="my-purchases">
                             <div class="flex items-center gap-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c.51 0 .962-.328 1.093-.826l1.821-6.831c.13-.483-.145-.996-.644-1.17a48.11 48.11 0 00-1.821-.545A48.11 48.11 0 007.5 4.5M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
@@ -118,7 +174,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                             </svg>
                         </div>
-                        <div onclick="navigateTo({type: 'subpage', id: 'help-subpage'})" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]">
+                        <div class="profile-menu-item bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]" data-action="help">
                             <div class="flex items-center gap-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
@@ -129,7 +185,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                             </svg>
                         </div>
-                        <div onclick="navigateTo({type: 'chat', id: 'chat-page'})" class="bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]">
+                        <div class="profile-menu-item bg-tg-secondary-bg p-4 rounded-xl flex justify-between items-center cursor-pointer transition-transform active:scale-[0.98]" data-action="support">
                             <div class="flex items-center gap-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.325 3.218.086 6.533-.533 9.491-2.311A2.25 2.25 0 0021 18.75V7.5a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 7.5v1.51z" />
@@ -148,12 +204,14 @@
                 </div>
             </div>
 
-            <div id="my-purchases-page" class="page hidden p-4">
-                <h2 class="text-xl font-bold">Mening Xaridlarim</h2>
-                <p class="text-tg-hint mt-4 text-center">Bu yerda siz sotib olgan akkauntlarning login va parollari ko'rinadi.</p>
+            <div id="my-purchases-page" class="page">
+                <div class="p-4">
+                    <h2 class="text-xl font-bold">Mening Xaridlarim</h2>
+                    <p class="text-tg-hint mt-4 text-center">Bu yerda siz sotib olgan akkauntlarning login va parollari ko'rinadi.</p>
+                </div>
             </div>
             
-            <div id="chat-page" class="page hidden flex flex-col h-full">
+            <div id="chat-page" class="page flex flex-col h-full">
                 <header class="flex-shrink-0 p-4 bg-tg-secondary-bg flex items-center gap-4 border-b border-gray-700/50">
                     <img src="https://via.placeholder.com/40" class="w-10 h-10 rounded-full">
                     <div>
@@ -170,13 +228,13 @@
                 <footer class="flex-shrink-0 p-2 bg-tg-secondary-bg border-t border-gray-700/50">
                     <div class="flex items-center gap-2">
                         <input type="file" id="image-input" accept="image/*" class="hidden">
-                        <button onclick="selectImage()" class="w-10 h-10 bg-tg-bg rounded-full flex items-center justify-center">
+                        <button id="select-image-btn" class="w-10 h-10 bg-tg-bg rounded-full flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-tg-hint">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                             </svg>
                         </button>
                         <input type="text" id="message-input" placeholder="Xabar yozing..." class="flex-1 bg-tg-bg rounded-full py-2 px-4 focus:outline-none">
-                        <button onclick="sendMessage()" class="w-10 h-10 bg-tg-button rounded-full flex items-center justify-center">
+                        <button id="send-message-btn" class="w-10 h-10 bg-tg-button rounded-full flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-white">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
                             </svg>
@@ -186,7 +244,9 @@
             </div>
         </main>
         
-        <footer id="bottom-nav" class="flex-shrink-0 h-16 bg-tg-secondary-bg/80 backdrop-blur-xl border-t border-gray-700/50 flex justify-around items-center"></footer>
+        <footer id="bottom-nav" class="bg-tg-secondary-bg/80 backdrop-blur-xl border-t border-gray-700/50 flex justify-around items-center">
+            <!-- Navigation will be generated by JavaScript -->
+        </footer>
     </div>
     
     <div id="item-modal" class="fixed inset-0 bg-tg-bg z-50 hidden flex-col transition-opacity duration-300 opacity-0"></div>
