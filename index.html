@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -40,11 +40,10 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* ✅ SODDALASHTIRILGAN VA ISHONCHLI CSS QOIDALARI */
         body { overflow: hidden; }
         main { padding-bottom: 70px; }
-        .page { display: none; } /* Barcha sahifalarni yashirish */
-        .page.active { display: block; } /* Faqat .active klassi borini ko'rsatish */
+        .page { display: none; }
+        .page.active { display: block; }
     </style>
 </head>
 <body class="bg-tg-bg text-tg-text font-sans antialiased">
@@ -59,8 +58,7 @@
                     </div>
                 </div>
                 <div class="px-4 py-3">
-                    <div id="category-container" class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
-                        </div>
+                    <div id="category-container" class="flex gap-2 overflow-x-auto no-scrollbar pb-2"></div>
                 </div>
                 <div class="flex justify-between items-center px-4 pt-1 pb-3">
                     <h2 class="text-2xl font-bold tracking-tight" data-translate-key="all_items">All Items</h2>
@@ -105,13 +103,12 @@
 
             <div id="my-purchases-page" class="page p-4">
                 <h2 class="text-xl font-bold mb-4" data-translate-key="my_purchases">My Purchases</h2>
-                <div id="my-purchases-container" class="space-y-3">
-                    </div>
+                <div id="my-purchases-container" class="space-y-3"></div>
             </div>
 
             <div id="help-page" class="page p-4">
                 <h2 class="text-xl font-bold text-center mb-4" data-translate-key="help_title">Help Center</h2>
-                <p class="text-tg-hint text-center" data-translate-key="help_content">If you have any questions, please contact our support team. We are here to help you 24/7.</p>
+                <p class="text-tg-hint text-center" data-translate-key="help_content"></p>
             </div>
             
             <div id="chat-page" class="page flex flex-col h-full">
@@ -120,7 +117,7 @@
                     <div><h3 class="font-bold" data-translate-key="support">Support</h3><p class="text-sm text-tg-hint">online</p></div>
                 </header>
                 <div class="flex-grow p-4 overflow-y-auto">
-                    <div class="text-center text-tg-hint text-sm" data-translate-key="chat_placeholder">Bu chat poydevori.</div>
+                    <div class="text-center text-tg-hint text-sm" data-translate-key="chat_placeholder"></div>
                 </div>
                 <footer class="flex-shrink-0 p-2 bg-tg-secondary-bg flex items-center gap-2 border-t border-gray-700/50">
                     <input type="text" data-translate-key="message_placeholder" placeholder="Xabar yozing..." class="w-full bg-tg-bg rounded-full py-2 px-4 focus:outline-none">
@@ -129,8 +126,7 @@
             </div>
         </main>
         
-        <footer id="bottom-nav" class="flex-shrink-0 h-16 bg-tg-secondary-bg/80 backdrop-blur-xl border-t border-gray-700/50 flex justify-around items-center">
-            </footer>
+        <footer id="bottom-nav" class="flex-shrink-0 h-16 bg-tg-secondary-bg/80 backdrop-blur-xl border-t border-gray-700/50 flex justify-around items-center"></footer>
     </div>
     
     <div id="item-modal-container"></div>
@@ -150,9 +146,6 @@
         document.addEventListener('DOMContentLoaded', function () {
             const tg = window.Telegram.WebApp;
 
-            // ==========================================================
-            // MA'LUMOTLAR BAZASI (DEMO)
-            // ==========================================================
             const dummyAds = [
                 { id: 3673, title: 'PUBG Mythic Account', price: '80', image: 'https://via.placeholder.com/600x600/2ea6ff/17212b?text=PUBG', isAdmin: false, description: 'Juda kuchli akkaunt.', category: 'PUBG' },
                 { id: 1550, title: 'Free Fire MAX', price: '7.6', image: 'https://via.placeholder.com/600x600/e91e63/17212b?text=FF', isAdmin: true, description: 'Admin maxsus taklifi.', category: 'Free Fire' },
@@ -166,9 +159,6 @@
             ];
             const categories = ['All', 'PUBG', 'Free Fire', 'Mobile Legends', 'CSGO'];
             
-            // ==========================================================
-            // TIL UCHUN LUG'AT
-            // ==========================================================
             const translations = {
                  'uz': { home: 'Bosh sahifa', all_items: 'Barcha mahsulotlar', buy_stars_nav: 'Yulduzlar', buy_stars: 'Yulduz Sotib Olish', history: 'Tarix', profile: 'Profil', my_purchases: "Mening xaridlarim", help: "Yordam", support: "Qo'llab-quvvatlash", language: "Tilni o'zgartirish", help_title: "Yordam Markazi", help_content: "Savollaringiz bo'lsa, yordam xizmatiga murojaat qiling.", support_chat: "Qo'llab-quvvatlash Chati", message_placeholder: "Xabar yozing...", coming_soon: "Bu bo'lim tez kunda ishga tushadi.", no_history: "Hozircha amallar mavjud emas.", login: "Login", password: "Parol", info: "Ma'lumot", chat_placeholder: 'Bu chat poydevori.', select_language: "Tilni tanlang" },
                  'ru': { home: 'Главная', all_items: 'Все товары', buy_stars_nav: 'Звезды', buy_stars: 'Купить Звезды', history: 'История', profile: 'Профиль', my_purchases: "Мои покупки", help: "Помощь", support: "Поддержка", language: "Сменить язык", help_title: "Центр помощи", help_content: "Если у вас есть вопросы, обратитесь в службу поддержки.", support_chat: "Чат с поддержкой", message_placeholder: "Напишите сообщение...", coming_soon: "Этот раздел скоро будет доступен.", no_history: "Пока нет транзакций.", login: "Логин", password: "Пароль", info: "Информация", chat_placeholder: 'Это заглушка для чата.', select_language: "Выберите язык" },
@@ -176,14 +166,14 @@
                  'ja': { home: 'ホーム', all_items: 'すべての商品', buy_stars_nav: 'スター', buy_stars: 'スターを購入', history: '履歴', profile: 'プロフィール', my_purchases: "私の購入", help: "ヘルプ", support: "サポート", language: "言語を変更", help_title: "ヘルプセンター", help_content: "ご不明な点がございましたら、サポートにお問い合わせください。", support_chat: "サポートチャット", message_placeholder: "メッセージを書いてください...", coming_soon: "このセクションは間もなく利用可能になります。", no_history: "まだ取引はありません。", login: "ログイン", password: "パスワード", info: "情報", chat_placeholder: 'これはチャットのプレースホルダーです。', select_language: "言語を選択" }
             };
             let currentLanguage = 'uz';
-            let navigationHistory = ['home-page']; // Orqaga qaytish uchun
+            let navigationHistory = ['home-page'];
 
             // ==========================================================
             // ASOSIY FUNKSIYALAR
             // ==========================================================
 
             function navigateTo(pageId, isSubPage = false) {
-                if (!isSubPage) { // Agar asosiy menyudan bosilsa, tarixni tozalaymiz
+                if (!isSubPage) {
                     navigationHistory = [pageId];
                 } else if (navigationHistory[navigationHistory.length - 1] !== pageId) {
                     navigationHistory.push(pageId);
@@ -211,14 +201,14 @@
                 if (navigationHistory.length > 1) {
                     navigationHistory.pop();
                     const previousPageId = navigationHistory[navigationHistory.length - 1];
-                    navigateTo(previousPageId, true); // `true` orqaga qaytish ekanini bildiradi
+                    navigateTo(previousPageId, true);
                 }
             }
 
             function renderItems(itemsToRender) {
                 const container = document.getElementById('card-container');
                 container.innerHTML = itemsToRender.map((ad, index) => `
-                    <div class="flex flex-col rounded-2xl ${ad.isAdmin ? 'bg-blue-900/40' : 'bg-tg-bg'} overflow-hidden cursor-pointer" style="animation: fade-in 0.5s ease forwards ${index * 0.1}s;">
+                    <div onclick="openModal(${ad.id})" class="flex flex-col rounded-2xl ${ad.isAdmin ? 'bg-blue-900/40' : 'bg-tg-bg'} overflow-hidden cursor-pointer active:scale-95" style="animation: fade-in 0.5s ease forwards ${index * 0.1}s;">
                         <img class="w-full h-auto aspect-square object-cover" src="${ad.image}" alt="${ad.title}">
                         <div class="p-3">
                             <p class="font-semibold truncate">${ad.title}</p>
@@ -230,16 +220,40 @@
                     </div>`).join('');
             }
 
+            window.openModal = function(adId) {
+                const ad = dummyAds.find(item => item.id === adId);
+                if (!ad) return;
+
+                const modalContainer = document.getElementById('item-modal-container');
+                modalContainer.innerHTML = `
+                <div id="item-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onclick="closeModal()">
+                    <div class="bg-tg-secondary-bg rounded-2xl w-full max-w-sm" onclick="event.stopPropagation()">
+                        <img src="${ad.image}" class="w-full aspect-video object-cover rounded-t-2xl">
+                        <div class="p-4">
+                            <h2 class="text-2xl font-bold">${ad.title}</h2>
+                            <p class="text-base mt-2 text-tg-hint">${ad.description}</p>
+                        </div>
+                        <footer class="p-4 border-t border-gray-700/50">
+                            <button class="w-full bg-tg-button text-white font-bold py-3 rounded-xl">Sotib olish</button>
+                        </footer>
+                    </div>
+                </div>`;
+            }
+
+            window.closeModal = function() {
+                const modalContainer = document.getElementById('item-modal-container');
+                modalContainer.innerHTML = '';
+            }
+
             function renderMyPurchases() {
                 const cont = document.getElementById('my-purchases-container');
-                const lang = currentLanguage;
                 cont.innerHTML = samplePurchases.map(p => `
                     <div class="bg-tg-secondary-bg p-4 rounded-xl">
                         <h3 class="font-bold text-lg mb-2">${p.title}</h3>
                         <div class="space-y-1 text-sm">
-                            <p><strong>${translations[lang].login}:</strong> ${p.login}</p>
-                            <p><strong>${translations[lang].password}:</strong> ${p.password}</p>
-                            <p><strong>${translations[lang].info}:</strong> ${p.info}</p>
+                            <p><strong data-translate-key="login"></strong>: ${p.login}</p>
+                            <p><strong data-translate-key="password"></strong>: ${p.password}</p>
+                            <p><strong data-translate-key="info"></strong>: ${p.info}</p>
                         </div>
                     </div>`).join('');
             }
@@ -270,9 +284,7 @@
                 document.querySelectorAll('[data-translate-key]').forEach(el => {
                     const key = el.getAttribute('data-translate-key');
                     const translation = translations[currentLanguage]?.[key];
-                    if (translation) {
-                        el.textContent = translation;
-                    }
+                    if (translation) el.textContent = translation;
                 });
                 document.querySelectorAll('.lang-btn').forEach(btn => {
                     btn.classList.toggle('active', btn.textContent.toLowerCase().startsWith(currentLanguage));
@@ -281,14 +293,13 @@
             }
 
             // ==========================================================
-            // ILOVANI SOZLASH (INITIALIZATION)
+            // ILOVANI ISHGA TUSHIRISH
             // ==========================================================
             
             if (tg) {
                 tg.ready();
                 tg.expand();
                 tg.onEvent('backButtonClicked', navigateBack);
-
                 const user = tg.initDataUnsafe?.user;
                 if (user) {
                     document.getElementById('profile-photo').src = user.photo_url || '';
