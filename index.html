@@ -32,7 +32,7 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         body { overflow: hidden; }
-        main { padding-bottom: 70px; }
+        /* main { padding-bottom: 70px; } <-- XATOLIK SABABCHISI BO'LGAN QATOR O'CHIRILDI */
         .page { display: none; }
         .page.active { display: block; }
 
@@ -323,9 +323,11 @@
                 navContainer.appendChild(navElement);
             });
 
-            document.getElementById('my-purchases-btn').addEventListener('click', () => navigateTo('my-purchases-page', true));
-            document.getElementById('help-btn').addEventListener('click', () => navigateTo('help-page', true));
-            document.getElementById('support-btn').addEventListener('click', () => navigateTo('chat-page', true));
+            document.getElementById('my-purchases-btn').addEventListener('click', () => navigateTo('my-purchases-page'));
+            document.getElementById('help-btn').addEventListener('click', () => navigateTo('help-page'));
+            document.getElementById('support-btn').addEventListener('click', () => navigateTo('chat-page'));
+            // TUGMA ISHLASHI UCHUN QO'SHILGAN QATOR
+            document.getElementById('language-btn').addEventListener('click', openLanguageModal);
 
             const categoryContainer = document.getElementById('category-container');
             categoryContainer.innerHTML = categories.map(cat => `<button data-category="${cat}" class="category-btn bg-tg-secondary-bg px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">${cat}</button>`).join('');
